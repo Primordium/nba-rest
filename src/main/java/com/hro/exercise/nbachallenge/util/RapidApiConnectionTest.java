@@ -12,7 +12,7 @@ public class RapidApiConnectionTest {
 
     public void getAllGames() {
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("https://rapidapi.p.rapidapi.com/games?page=0&per_page=25"))
+                .uri(URI.create("https://rapidapi.p.rapidapi.com/stats?game_ids[]=48762"))
                 .header("x-rapidapi-host", "free-nba.p.rapidapi.com")
                 .header("x-rapidapi-key", "c29e9e9b2fmshe04ede3c49d8164p1215edjsnf93801d1751d")
                 .method("GET", HttpRequest.BodyPublishers.noBody())
