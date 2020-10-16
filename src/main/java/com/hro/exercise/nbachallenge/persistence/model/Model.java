@@ -1,4 +1,4 @@
-package com.hro.exercise.nbachallenge.model;
+package com.hro.exercise.nbachallenge.persistence.model;
 
 /**
  *  Interface for a model, provides methods to get ids

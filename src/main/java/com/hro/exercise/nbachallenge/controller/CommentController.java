@@ -1,6 +1,6 @@
 package com.hro.exercise.nbachallenge.controller;
 
-import com.hro.exercise.nbachallenge.model.Comment;
+import com.hro.exercise.nbachallenge.persistence.model.Comment;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

@@ -8,6 +8,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class NbaChallengeApplication {
 
 	public static void main(String[] args) {
+
+		// TODO Test db connection on start
+
 		SpringApplication.run(NbaChallengeApplication.class, args);
 		RapidApiConnectionTest rapidApiConnectionTest = new RapidApiConnectionTest();
 		rapidApiConnectionTest.getAllGames();
