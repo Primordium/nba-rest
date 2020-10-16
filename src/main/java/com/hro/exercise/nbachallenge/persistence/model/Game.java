@@ -7,11 +7,11 @@ import java.util.*;
 @Table(name = "games")
 public class Game extends AbstractModel{
 
-    private Date gameDate;
+    private String date;
     private String homeTeamName;
-    private String awayTeamName;
+    private String visitorTeamName;
     private Integer homeTeamScore;
-    private Integer awayTeamScore;
+    private Integer visitorTeamScore;
 
     @ElementCollection
     private Map<Player, Integer> playerScores;
@@ -36,5 +36,18 @@ public class Game extends AbstractModel{
 
     public void updateComment(Integer commentId, Comment comment) {
         commentList.get(commentId).setComment(comment.getComment());
+    }
+
+    @Override
+    public String toString() {
+        return "Game{" +
+                "gameDate=" + date +
+                ", home_team='" + homeTeamName + '\'' +
+                ", awayTeamName='" + visitorTeamName + '\'' +
+                ", home_team_score=" + homeTeamScore +
+                ", awayTeamScore=" + visitorTeamScore +
+                ", playerScores=" + playerScores +
+                ", commentList=" + commentList +
+                '}';
     }
 }

@@ -1,8 +1,10 @@
 package com.hro.exercise.nbachallenge;
 
-import com.hro.exercise.nbachallenge.util.RapidApiConnectionTest;
+import com.hro.exercise.nbachallenge.util.RapidApiConnection;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import java.io.IOException;
 
 @SpringBootApplication
 public class NbaChallengeApplication {
@@ -12,8 +14,12 @@ public class NbaChallengeApplication {
 		// TODO Test db connection on start
 
 		SpringApplication.run(NbaChallengeApplication.class, args);
-		RapidApiConnectionTest rapidApiConnectionTest = new RapidApiConnectionTest();
-		rapidApiConnectionTest.getAllGames();
+		RapidApiConnection rapidApiConnectionTest = new RapidApiConnection();
+		try {
+			rapidApiConnectionTest.getAllGames();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 
