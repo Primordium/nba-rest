@@ -8,10 +8,12 @@ import java.util.Date;
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class CommentDto {
 
+    private Integer id;
+
     @NotNull
     private String comment;
 
-    private Integer id;
+    @NotNull
     private Date date;
 
     public String getComment() {
