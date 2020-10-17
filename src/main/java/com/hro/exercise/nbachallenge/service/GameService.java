@@ -1,4 +1,9 @@
 package com.hro.exercise.nbachallenge.service;
 
-public class GameService {
+import com.hro.exercise.nbachallenge.persistence.model.Game;
+
+public interface GameService {
+    Game get(Integer id);
+    Game save(Game game);
+    void delete(Integer id);
 }

@@ -7,7 +7,7 @@ import java.util.*;
 @Table(name = "games")
 public class Game extends AbstractModel {
 
-    private Date date;
+    private Date gameDate;
     private Integer gameId;
     private String homeTeamName;
     private String visitorTeamName;
@@ -38,12 +38,12 @@ public class Game extends AbstractModel {
         commentList.get(commentId).setComment(comment.getComment());
     }
 
-    public Date getDate() {
-        return date;
+    public Date getGameDate() {
+        return gameDate;
     }
 
-    public void setDate(Date date) {
-        this.date = date;
+    public void setGameDate(Date date) {
+        this.gameDate = date;
     }
 
 
@@ -106,7 +106,7 @@ public class Game extends AbstractModel {
     @Override
     public String toString() {
         return "Game{" +
-                "date=" + date +
+                "date=" + gameDate +
                 ", gameId=" + gameId +
                 ", homeTeamName='" + homeTeamName + '\'' +
                 ", visitorTeamName='" + visitorTeamName + '\'' +
