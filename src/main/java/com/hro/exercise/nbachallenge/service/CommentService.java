@@ -1,21 +1,21 @@
 package com.hro.exercise.nbachallenge.service;
 
-import com.hro.exercise.nbachallenge.persistence.dao.jpa.CommentDao;
+import com.hro.exercise.nbachallenge.persistence.dao.jpa.JpaCommentDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class CommentService {
 
-    private CommentDao commentDao;
+    private JpaCommentDao commentDao;
 
     @Autowired
-    public CommentDao getCommentDao() {
+    public JpaCommentDao getCommentDao() {
         return commentDao;
     }
 
     @Autowired
-    public void setCommentDao(CommentDao commentDao) {
+    public void setCommentDao(JpaCommentDao commentDao) {
         this.commentDao = commentDao;
     }
 }

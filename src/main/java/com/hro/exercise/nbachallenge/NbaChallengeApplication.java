@@ -9,20 +9,20 @@ import java.io.IOException;
 @SpringBootApplication
 public class NbaChallengeApplication {
 
-	public static void main(String[] args) {
+    public static void main(String[] args) {
 
-		// TODO Test db connection on start
+        // TODO Test db connection on start
 
-		SpringApplication.run(NbaChallengeApplication.class, args);
-		RapidApiConnection rapidApiConnectionTest = new RapidApiConnection();
-		try {
-			rapidApiConnectionTest.getAllGames();
-			rapidApiConnectionTest.getGamesByDate("2019-03-30");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+        SpringApplication.run(NbaChallengeApplication.class, args);
+        RapidApiConnection rapidApiConnectionTest = new RapidApiConnection();
 
+        try {
+            rapidApiConnectionTest.getAllGames();
+            rapidApiConnectionTest.getGamesByDate("2019-03-30");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
 
 }

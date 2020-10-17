@@ -9,9 +9,11 @@ import javax.persistence.Table;
 @Table(name = "comments")
 public class Comment extends AbstractModel{
 
+    private String comment;
+
     @ManyToOne
     private Game game;
-    private String comment;
+
 
     /**
      * Gets the comment
@@ -24,6 +26,14 @@ public class Comment extends AbstractModel{
 
     public void setComment(String comment) {
         this.comment = comment;
+    }
+
+    public Game getGame() {
+        return game;
+    }
+
+    public void setGame(Game game) {
+        this.game = game;
     }
 
     @Override

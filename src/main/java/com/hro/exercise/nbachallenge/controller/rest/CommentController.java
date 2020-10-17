@@ -1,4 +1,4 @@
-package com.hro.exercise.nbachallenge.controller;
+package com.hro.exercise.nbachallenge.controller.rest;
 
 import com.hro.exercise.nbachallenge.persistence.model.Comment;
 import org.springframework.web.bind.annotation.*;

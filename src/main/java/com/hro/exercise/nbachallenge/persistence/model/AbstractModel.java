@@ -3,10 +3,7 @@ package com.hro.exercise.nbachallenge.persistence.model;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.MappedSuperclass;
+import javax.persistence.*;
 import java.util.Date;
 
 @MappedSuperclass
@@ -16,13 +13,13 @@ public abstract class AbstractModel implements Model{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @Version
+    private Integer version;
     @CreationTimestamp
     private Date creationTime;
-
     @UpdateTimestamp
     private Date updateTime;
 
-    private Integer gameId;
     /**
      * @see Model#getId()
      */
@@ -55,18 +52,19 @@ public abstract class AbstractModel implements Model{
         this.updateTime = updateTime;
     }
 
-    public Integer getGameId() {
-        return gameId;
+    public Integer getVersion() {
+        return version;
     }
 
-    public void setGameId(Integer gameId) {
-        this.gameId = gameId;
+    public void setVersion(Integer version) {
+        this.version = version;
     }
 
     @Override
     public String toString() {
         return "AbstractModel{" +
                 "id=" + id +
+                ", version=" + version +
                 ", creationTime=" + creationTime +
                 ", updateTime=" + updateTime +
                 '}';

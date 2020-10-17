@@ -5,9 +5,10 @@ import java.util.*;
 
 @Entity
 @Table(name = "games")
-public class Game extends AbstractModel{
+public class Game extends AbstractModel {
 
-    private String date;
+    private Date date;
+    private Integer gameId;
     private String homeTeamName;
     private String visitorTeamName;
     private Integer homeTeamScore;
@@ -16,12 +17,11 @@ public class Game extends AbstractModel{
     @ElementCollection
     private Map<Player, Integer> playerScores;
 
-
     @OneToMany(
-            cascade = {CascadeType.ALL},
+            cascade = CascadeType.ALL,
             orphanRemoval = true,
-            mappedBy = "games",
-            fetch = FetchType.EAGER
+            mappedBy = "games"
+            //fetch = FetchType.EAGER
     )
     private List<Comment> commentList = new ArrayList<>();
 
@@ -38,14 +38,80 @@ public class Game extends AbstractModel{
         commentList.get(commentId).setComment(comment.getComment());
     }
 
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
+
+    public String getHomeTeamName() {
+        return homeTeamName;
+    }
+
+    public void setHomeTeamName(String homeTeamName) {
+        this.homeTeamName = homeTeamName;
+    }
+
+    public String getVisitorTeamName() {
+        return visitorTeamName;
+    }
+
+    public void setVisitorTeamName(String visitorTeamName) {
+        this.visitorTeamName = visitorTeamName;
+    }
+
+    public Integer getHomeTeamScore() {
+        return homeTeamScore;
+    }
+
+    public void setHomeTeamScore(Integer homeTeamScore) {
+        this.homeTeamScore = homeTeamScore;
+    }
+
+    public Integer getVisitorTeamScore() {
+        return visitorTeamScore;
+    }
+
+    public void setVisitorTeamScore(Integer visitorTeamScore) {
+        this.visitorTeamScore = visitorTeamScore;
+    }
+
+    public Map<Player, Integer> getPlayerScores() {
+        return playerScores;
+    }
+
+    public void setPlayerScores(Map<Player, Integer> playerScores) {
+        this.playerScores = playerScores;
+    }
+
+    public List<Comment> getCommentList() {
+        return commentList;
+    }
+
+    public void setCommentList(List<Comment> commentList) {
+        this.commentList = commentList;
+    }
+
+    public Integer getGameId() {
+        return gameId;
+    }
+
+    public void setGameId(Integer gameId) {
+        this.gameId = gameId;
+    }
+
     @Override
     public String toString() {
         return "Game{" +
-                "gameDate=" + date +
-                ", home_team='" + homeTeamName + '\'' +
-                ", awayTeamName='" + visitorTeamName + '\'' +
-                ", home_team_score=" + homeTeamScore +
-                ", awayTeamScore=" + visitorTeamScore +
+                "date=" + date +
+                ", gameId=" + gameId +
+                ", homeTeamName='" + homeTeamName + '\'' +
+                ", visitorTeamName='" + visitorTeamName + '\'' +
+                ", homeTeamScore=" + homeTeamScore +
+                ", visitorTeamScore=" + visitorTeamScore +
                 ", playerScores=" + playerScores +
                 ", commentList=" + commentList +
                 '}';

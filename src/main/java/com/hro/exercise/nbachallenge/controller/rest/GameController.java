@@ -1,4 +1,4 @@
-package com.hro.exercise.nbachallenge.controller;
+package com.hro.exercise.nbachallenge.controller.rest;
 
 import com.hro.exercise.nbachallenge.persistence.model.Game;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +12,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/nbadb")
 public class GameController {
+
 
     @GetMapping(path = {"/", ""})
     public String usageInstructions() {
