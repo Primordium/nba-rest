@@ -22,6 +22,7 @@ public class PlayerDtoToPlayer extends AbstractConverter<PlayerDto, Player>{
         Player player = (playerDto.getId() != null ? playerService.get(playerDto.getId()) : new Player());
         player.setLastName(playerDto.getLastName());
         player.setFirstName(playerDto.getFirstName());
+        System.out.println(player);
 
         return player;
     }

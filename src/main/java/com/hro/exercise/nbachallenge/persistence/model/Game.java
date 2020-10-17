@@ -1,5 +1,7 @@
 package com.hro.exercise.nbachallenge.persistence.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import javax.persistence.*;
 import java.util.*;
 
@@ -7,7 +9,9 @@ import java.util.*;
 @Table(name = "games")
 public class Game extends AbstractModel {
 
+
     private Date gameDate;
+    @Column(name = "gameId", nullable = false)
     private Integer gameId;
     private String homeTeamName;
     private String visitorTeamName;
@@ -19,8 +23,8 @@ public class Game extends AbstractModel {
 
     @OneToMany(
             cascade = CascadeType.ALL,
-            orphanRemoval = true,
-            mappedBy = "games"
+            orphanRemoval = true
+            //mappedBy = "games"
             //fetch = FetchType.EAGER
     )
     private List<Comment> commentList = new ArrayList<>();
@@ -116,4 +120,6 @@ public class Game extends AbstractModel {
                 ", commentList=" + commentList +
                 '}';
     }
+
+
 }

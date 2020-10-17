@@ -1,9 +1,12 @@
 package com.hro.exercise.nbachallenge.persistence.model;
 
 import javax.persistence.Entity;
+import javax.persistence.Table;
 
 @Entity
+@Table
 public class Player extends AbstractModel{
+
 
     private String firstName;
     private String lastName;
@@ -23,5 +26,13 @@ public class Player extends AbstractModel{
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    @Override
+    public String toString() {
+        return "Player{" +
+                "firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                '}';
     }
 }

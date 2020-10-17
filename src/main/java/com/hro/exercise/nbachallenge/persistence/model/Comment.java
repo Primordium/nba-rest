@@ -1,13 +1,10 @@
 package com.hro.exercise.nbachallenge.persistence.model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "comments")
-public class Comment extends AbstractModel{
+public class Comment extends AbstractModel {
 
     private String comment;
 
@@ -42,5 +39,6 @@ public class Comment extends AbstractModel{
                 "comment='" + comment + '\'' +
                 '}';
     }
+
 
 }

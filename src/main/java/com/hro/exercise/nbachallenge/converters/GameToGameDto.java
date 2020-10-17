@@ -1,6 +1,7 @@
 package com.hro.exercise.nbachallenge.converters;
 
 import com.hro.exercise.nbachallenge.command.GameDto;
+import com.hro.exercise.nbachallenge.command.PlayerDto;
 import com.hro.exercise.nbachallenge.persistence.model.Game;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -11,10 +12,16 @@ import java.util.Map;
 @Component
 public class GameToGameDto extends AbstractConverter<Game, GameDto>{
     private CommentToCommentDto commentToCommentDto;
+    private PlayerToPlayerDto playerToPlayerDto;
 
     @Autowired
     public void setCommentToCommentDto(CommentToCommentDto commentToCommentDto) {
         this.commentToCommentDto = commentToCommentDto;
+    }
+
+    @Autowired
+    public void setPlayerDtoToPlayer(PlayerToPlayerDto playerDtoToPlayer) {
+        this.playerToPlayerDto = playerDtoToPlayer;
     }
 
     @Override
@@ -27,19 +34,16 @@ public class GameToGameDto extends AbstractConverter<Game, GameDto>{
         gameDto.setVisitorTeamName(game.getVisitorTeamName());
         gameDto.setGameDate(game.getGameDate());
 
-        Map<String, Integer> playerAndScores = new HashMap<>();
+        Map<PlayerDto, Integer> playerAndScores = new HashMap<>();
 
         game.getPlayerScores().forEach((player, score) -> {
-            String name = player.getLastName() + ", " + player.getFirstName();
+            PlayerDto playerDto = playerToPlayerDto.convert(player);
             Integer points = score.intValue();
-            playerAndScores.put(name, points);
+            playerAndScores.put(playerDto, points);
         });
 
         gameDto.setComments(commentToCommentDto.convert(game.getCommentList()));
 
-
-
-
-        return null;
+        return gameDto;
     }
 }

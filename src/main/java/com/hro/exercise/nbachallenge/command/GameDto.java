@@ -9,7 +9,7 @@ import java.util.Map;
 
 public class GameDto {
 
-    @NotNull
+    //@NotNull
     private Integer id;
 
     private Integer gameId;
@@ -91,5 +91,21 @@ public class GameDto {
 
     public void setComments(List<CommentDto> comments) {
         this.comments = comments;
+    }
+
+    @Override
+    public String toString() {
+
+        return "GameDto{" +
+                "id=" + id +
+                ", gameId=" + gameId +
+                ", gameDate=" + gameDate +
+                ", homeTeamName='" + homeTeamName + '\'' +
+                ", visitorTeamName='" + visitorTeamName + '\'' +
+                ", homeTeamScore=" + homeTeamScore +
+                ", visitorTeamScore=" + visitorTeamScore +
+                ", playerScores=" + playerScores.toString() +
+                ", comments=" + comments +
+                '}';
     }
 }
