@@ -12,7 +12,6 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.file.Paths;
 import java.text.ParseException;
-import java.util.HashMap;
 import java.util.Map;
 
 @Component
@@ -95,8 +94,6 @@ public class RapidApiConnection {
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        System.out.println(response.body());
-        System.out.println(gameDto);
         return gameDto;
     }
 }

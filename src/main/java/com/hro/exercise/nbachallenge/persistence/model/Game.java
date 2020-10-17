@@ -1,6 +1,8 @@
 package com.hro.exercise.nbachallenge.persistence.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.springframework.core.Ordered;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.persistence.*;
 import java.util.*;
@@ -10,22 +12,32 @@ import java.util.*;
 public class Game extends AbstractModel {
 
 
+    @JsonProperty
     private Date gameDate;
     @Column(name = "gameId", nullable = false)
+    @JsonProperty
     private Integer gameId;
+    @JsonProperty
     private String homeTeamName;
+    @JsonProperty
     private String visitorTeamName;
+    @JsonProperty
     private Integer homeTeamScore;
+    @JsonProperty
     private Integer visitorTeamScore;
-
-    @ElementCollection
-    private Map<Player, Integer> playerScores;
 
     @OneToMany(
             cascade = CascadeType.ALL,
-            orphanRemoval = true
-            //mappedBy = "games"
-            //fetch = FetchType.EAGER
+            orphanRemoval = true,
+            fetch = FetchType.LAZY,
+            mappedBy = "game"
+    )
+    private List<PlayerScores> playerScores;
+
+    @OneToMany(
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY
     )
     private List<Comment> commentList = new ArrayList<>();
 
@@ -41,6 +53,7 @@ public class Game extends AbstractModel {
     public void updateComment(Integer commentId, Comment comment) {
         commentList.get(commentId).setComment(comment.getComment());
     }
+
 
     public Date getGameDate() {
         return gameDate;
@@ -83,11 +96,11 @@ public class Game extends AbstractModel {
         this.visitorTeamScore = visitorTeamScore;
     }
 
-    public Map<Player, Integer> getPlayerScores() {
+    public List<PlayerScores> getPlayerScores() {
         return playerScores;
     }
 
-    public void setPlayerScores(Map<Player, Integer> playerScores) {
+    public void setPlayerScores(List<PlayerScores> playerScores) {
         this.playerScores = playerScores;
     }
 

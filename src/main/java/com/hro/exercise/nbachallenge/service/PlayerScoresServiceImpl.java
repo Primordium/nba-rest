@@ -1,35 +1,35 @@
 package com.hro.exercise.nbachallenge.service;
 
-import com.hro.exercise.nbachallenge.persistence.dao.jpa.JpaPlayerDao;
-import com.hro.exercise.nbachallenge.persistence.model.Player;
+import com.hro.exercise.nbachallenge.persistence.dao.jpa.JpaPlayerScoresDao;
+import com.hro.exercise.nbachallenge.persistence.model.PlayerScores;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 
 @Service
-public class PlayerServiceImpl implements PlayerService{
+public class PlayerScoresServiceImpl implements PlayerScoresService {
 
-    private JpaPlayerDao playerDao;
+    private JpaPlayerScoresDao playerDao;
 
     @Autowired
-    public JpaPlayerDao getPlayerDao() {
+    public JpaPlayerScoresDao getPlayerDao() {
         return playerDao;
     }
     @Autowired
-    public void setPlayerDao(JpaPlayerDao playerDao) {
+    public void setPlayerDao(JpaPlayerScoresDao playerDao) {
         this.playerDao = playerDao;
     }
 
     @Override
-    public Player get(Integer id) {
+    public PlayerScores get(Integer id) {
         return playerDao.findById(id);
     }
 
     @Transactional
     @Override
-    public Player save(Player player) {
-        return playerDao.saveOrUpdate(player);
+    public PlayerScores save(PlayerScores playerScores) {
+        return playerDao.saveOrUpdate(playerScores);
     }
 
     @Transactional

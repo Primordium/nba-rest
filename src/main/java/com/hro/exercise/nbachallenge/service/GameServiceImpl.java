@@ -12,7 +12,6 @@ public class GameServiceImpl implements GameService{
 
     private JpaGameDao gameDao;
 
-
     @Autowired
     public void setJpaGameDao(JpaGameDao jpaGameDao) {
         this.gameDao = jpaGameDao;
@@ -26,6 +25,12 @@ public class GameServiceImpl implements GameService{
     @Transactional
     @Override
     public Game save(Game game) {
+        game.getPlayerScores().stream().forEach(e -> {
+            e.setGame(game);
+        });
+        game.getCommentList().stream().forEach(e -> {
+            e.setGame(game);
+        });
         return gameDao.saveOrUpdate(game);
     }
 
@@ -37,7 +42,6 @@ public class GameServiceImpl implements GameService{
 
     @Override
     public Game getByGameId(Integer id) {
-
        return gameDao.findByGameId(id);
     }
 }

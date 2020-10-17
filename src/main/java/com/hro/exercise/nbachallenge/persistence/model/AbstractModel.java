@@ -1,5 +1,6 @@
 package com.hro.exercise.nbachallenge.persistence.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -10,14 +11,19 @@ import java.util.Date;
 public abstract class AbstractModel implements Model {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @JsonIgnore
     private Integer id;
 
     @Version
+    @JsonIgnore
     private Integer version;
     @CreationTimestamp
+    @Column(updatable = false)
+    @JsonIgnore
     private Date creationTime;
     @UpdateTimestamp
+    @JsonIgnore
     private Date updateTime;
 
     /**

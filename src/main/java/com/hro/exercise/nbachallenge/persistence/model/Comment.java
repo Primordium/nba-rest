@@ -1,5 +1,7 @@
 package com.hro.exercise.nbachallenge.persistence.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 
 @Entity
@@ -9,6 +11,7 @@ public class Comment extends AbstractModel {
     private String comment;
 
     @ManyToOne
+    @JsonIgnore
     private Game game;
 
 

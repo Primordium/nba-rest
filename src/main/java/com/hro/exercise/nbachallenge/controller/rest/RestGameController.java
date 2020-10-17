@@ -5,7 +5,7 @@ import com.hro.exercise.nbachallenge.converters.GameDtoToGame;
 import com.hro.exercise.nbachallenge.persistence.model.Game;
 import com.hro.exercise.nbachallenge.service.CommentService;
 import com.hro.exercise.nbachallenge.service.GameService;
-import com.hro.exercise.nbachallenge.service.PlayerService;
+import com.hro.exercise.nbachallenge.service.PlayerScoresService;
 import com.hro.exercise.nbachallenge.util.RapidApiConnection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -23,7 +23,7 @@ public class RestGameController {
     private RapidApiConnection rapidApiConnection = new RapidApiConnection();
     private GameService gameService;
     private CommentService commentService;
-    private PlayerService playerService;
+    private PlayerScoresService playerScoresService;
     private GameDtoToGame gameDtoToGame;
 
     @Autowired
@@ -45,8 +45,8 @@ public class RestGameController {
         this.commentService = commentService;
     }
     @Autowired
-    public void setPlayerService(PlayerService playerService) {
-        this.playerService = playerService;
+    public void setPlayerScoresService(PlayerScoresService playerScoresService) {
+        this.playerScoresService = playerScoresService;
     }
 
     @GetMapping(path = {"/", ""})

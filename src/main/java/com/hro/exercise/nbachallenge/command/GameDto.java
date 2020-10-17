@@ -1,8 +1,6 @@
 package com.hro.exercise.nbachallenge.command;
 
 
-import com.sun.istack.NotNull;
-
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -18,7 +16,7 @@ public class GameDto {
     private String visitorTeamName;
     private Integer homeTeamScore;
     private Integer visitorTeamScore;
-    private Map<PlayerDto, Integer> playerScores;
+    private List<PlayerScoresDto> playerScores;
     private List<CommentDto> comments;
 
     public Integer getId() {
@@ -69,11 +67,11 @@ public class GameDto {
         this.visitorTeamScore = visitorTeamScore;
     }
 
-    public Map<PlayerDto, Integer> getPlayerScores() {
+    public List<PlayerScoresDto> getPlayerScores() {
         return playerScores;
     }
 
-    public void setPlayerScores(Map<PlayerDto, Integer> playerScores) {
+    public void setPlayerScores(List<PlayerScoresDto> playerScores) {
         this.playerScores = playerScores;
     }
 
