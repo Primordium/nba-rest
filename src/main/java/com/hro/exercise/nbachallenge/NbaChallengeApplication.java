@@ -17,6 +17,7 @@ public class NbaChallengeApplication {
 		RapidApiConnection rapidApiConnectionTest = new RapidApiConnection();
 		try {
 			rapidApiConnectionTest.getAllGames();
+			rapidApiConnectionTest.getGamesByDate("2019-03-30");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
