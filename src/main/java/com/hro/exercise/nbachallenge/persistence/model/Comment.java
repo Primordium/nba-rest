@@ -1,6 +1,7 @@
 package com.hro.exercise.nbachallenge.persistence.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -15,8 +16,16 @@ public class Comment extends AbstractModel {
     @JsonIgnore
     private Game game;
 
+    @Temporal(TemporalType.DATE)
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date date;
 
+    public Comment() {
+    }
+
+    public Comment(String comment) {
+        this.comment = comment;
+    }
 
     /**
      * Gets the comment
@@ -46,6 +55,8 @@ public class Comment extends AbstractModel {
     public void setDate(Date date) {
         this.date = date;
     }
+
+    
 
     @Override
     public String toString() {

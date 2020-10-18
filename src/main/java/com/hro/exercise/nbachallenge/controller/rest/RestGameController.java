@@ -85,9 +85,6 @@ public class RestGameController {
     public GameDto getGameByIdWithPath(@PathVariable Integer gameId) {
         if (gameRepository.findByGameId(gameId) != null) {
             System.out.println("found");
-            System.out.println(gameRepository.findByGameId(gameId));
-            System.out.println(gameToGameDto.convert(gameRepository.findByGameId(gameId)));
-            System.out.println(gameRepository.findByGameId(gameId).getPlayerScores());
             return gameToGameDto.convert(gameRepository.findByGameId(gameId));
         } else {
             System.out.println("searching api");

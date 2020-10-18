@@ -2,7 +2,10 @@ package com.hro.exercise.nbachallenge.command;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.sun.istack.NotNull;
+import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import java.util.Date;
 
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
@@ -14,6 +17,8 @@ public class CommentDto {
     private String comment;
 
     @NotNull
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @Temporal(TemporalType.DATE)
     private Date date;
 
     public String getComment() {
