@@ -7,7 +7,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/nbadb")
-public class CommentController {
+public class RestCommentController {
 
     // Creates new Comment (requires gameId)
     // Updates a Comment (requires commentId)

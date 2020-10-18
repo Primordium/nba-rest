@@ -76,7 +76,9 @@ public class RestGameController {
 
     @GetMapping("date/{date}")
     public List<Game> getGamesByDateWithPath(@PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") Date date) {
-        return gameRepository.findAll().stream().filter(e -> e.getGameDate() == date).collect(Collectors.toList());
+        List<Game> games = gameRepository.findAll().stream().filter(e -> e.getGameDate().equals(date)).collect(Collectors.toList());
+        return games;
+
     }
 
     @GetMapping("/game/{gameId}")
@@ -90,10 +92,9 @@ public class RestGameController {
         } else {
             System.out.println("searching api");
             GameDto gameDto = rapidApiConnection.getGameById(gameId);
-            System.out.println(gameDto);
             gameRepository.save(gameDtoToGame.convert(gameDto));
+            return gameDto;
         }
-        return null;
     }
 
     @GetMapping("game")
