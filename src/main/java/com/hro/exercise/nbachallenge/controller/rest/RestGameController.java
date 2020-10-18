@@ -8,6 +8,7 @@ import com.hro.exercise.nbachallenge.service.GameService;
 import com.hro.exercise.nbachallenge.service.PlayerScoresService;
 import com.hro.exercise.nbachallenge.util.RapidApiConnection;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
@@ -57,13 +58,13 @@ public class RestGameController {
 
     @GetMapping("/date")
     public List<Game> getGamesByDate(
-            @RequestParam(value = "date", required = true) Date dateOrNull) {
-        return null;
+            @RequestParam(value = "date", required = true) @DateTimeFormat(pattern = "yyyy-MM-dd") Date date) {
+        return getGamesByDateWithPath(date);
     }
 
     @GetMapping("date/{date}")
-    public List<Game> getGamesByDateWithPath(@PathVariable Date date) {
-        return null;
+    public List<Game> getGamesByDateWithPath(@PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") Date date ) {
+        return gameService.getByGameDate(date);
     }
 
     @GetMapping("/game/{gameId}")
@@ -81,7 +82,7 @@ public class RestGameController {
 
     @GetMapping("game")
     public Game getGameById(
-            @RequestParam(value = "gameid", required = true) String gameId){
-        return null;
+            @RequestParam(value = "gameid", required = true) Integer gameId){
+        return getGameByIdWithPath(gameId);
     }
 }

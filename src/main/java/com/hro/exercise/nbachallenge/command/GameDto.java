@@ -1,6 +1,10 @@
 package com.hro.exercise.nbachallenge.command;
 
 
+import org.springframework.format.annotation.DateTimeFormat;
+
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +15,8 @@ public class GameDto {
     private Integer id;
 
     private Integer gameId;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @Temporal(TemporalType.DATE)
     private Date gameDate;
     private String homeTeamName;
     private String visitorTeamName;

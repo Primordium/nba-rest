@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.Date;
+import java.util.List;
 
 @Service
 public class GameServiceImpl implements GameService{
@@ -44,4 +46,11 @@ public class GameServiceImpl implements GameService{
     public Game getByGameId(Integer id) {
        return gameDao.findByGameId(id);
     }
+
+    @Override
+    public List<Game> getByGameDate(Date date) {
+        System.out.println(gameDao.findByGameDate(date));
+        return gameDao.findByGameDate(date);
+    }
+
 }

@@ -20,6 +20,7 @@ public class CommentDtoToComment extends AbstractConverter<CommentDto, Comment>{
     public Comment convert(CommentDto commentDto) {
         Comment comment = (commentDto.getId() != null ? commentService.get(commentDto.getId()) : new Comment());
         comment.setComment(commentDto.getComment());
+        comment.setDate(commentDto.getDate());
 
         return comment;
     }

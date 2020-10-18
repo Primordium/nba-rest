@@ -2,6 +2,7 @@ package com.hro.exercise.nbachallenge.persistence.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.core.Ordered;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.persistence.*;
@@ -13,6 +14,8 @@ public class Game extends AbstractModel {
 
 
     @JsonProperty
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @Temporal(TemporalType.DATE)
     private Date gameDate;
     @Column(name = "gameId", nullable = false)
     @JsonProperty

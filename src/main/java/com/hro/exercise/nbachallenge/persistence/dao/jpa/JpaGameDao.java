@@ -4,6 +4,7 @@ import com.hro.exercise.nbachallenge.persistence.dao.GameDao;
 import com.hro.exercise.nbachallenge.persistence.model.Game;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
 import java.util.List;
 
 @Repository
@@ -22,4 +23,7 @@ public class JpaGameDao extends GenericJpaDao<Game> implements GameDao {
            return (Game) result.get(0);
     }
 
+    public List<Game> findByGameDate(Date date) {
+            return em.createNativeQuery("SELECT * FROM GAMES WHERE GAME_DATE = :value", Game.class).setParameter("value", date).getResultList();
+    }
 }
