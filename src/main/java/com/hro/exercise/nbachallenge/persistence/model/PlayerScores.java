@@ -6,6 +6,8 @@ import org.springframework.core.Ordered;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.persistence.*;
+import java.util.Optional;
+
 @Entity
 @Table
 public class PlayerScores extends AbstractModel{

@@ -1,6 +1,7 @@
 package com.hro.exercise.nbachallenge.command;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.Temporal;
@@ -22,6 +23,7 @@ public class GameDto {
     private String visitorTeamName;
     private Integer homeTeamScore;
     private Integer visitorTeamScore;
+    @JsonProperty
     private List<PlayerScoresDto> playerScores;
     private List<CommentDto> comments;
 

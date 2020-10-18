@@ -2,10 +2,11 @@ package com.hro.exercise.nbachallenge.controller.rest;
 
 import com.hro.exercise.nbachallenge.command.GameDto;
 import com.hro.exercise.nbachallenge.converters.GameDtoToGame;
+import com.hro.exercise.nbachallenge.converters.GameToGameDto;
+import com.hro.exercise.nbachallenge.persistence.dao.CommentRepository;
+import com.hro.exercise.nbachallenge.persistence.dao.GameRepository;
+import com.hro.exercise.nbachallenge.persistence.dao.PlayerScoresRepository;
 import com.hro.exercise.nbachallenge.persistence.model.Game;
-import com.hro.exercise.nbachallenge.service.CommentService;
-import com.hro.exercise.nbachallenge.service.GameService;
-import com.hro.exercise.nbachallenge.service.PlayerScoresService;
 import com.hro.exercise.nbachallenge.util.RapidApiConnection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 // List Games for a Given Date (needs Date)
 // Returns data for a single game (needs gameId)
@@ -21,11 +23,19 @@ import java.util.List;
 @RequestMapping("/api/nbadb")
 public class RestGameController {
 
+
+    private PlayerScoresRepository playerScoresRepository;
+    private GameRepository gameRepository;
+    private CommentRepository commentRepository;
+    private GameToGameDto gameToGameDto;
+
     private RapidApiConnection rapidApiConnection = new RapidApiConnection();
-    private GameService gameService;
-    private CommentService commentService;
-    private PlayerScoresService playerScoresService;
     private GameDtoToGame gameDtoToGame;
+
+    @Autowired
+    public void setGameToGameDto(GameToGameDto gameToGameDto) {
+        this.gameToGameDto = gameToGameDto;
+    }
 
     @Autowired
     public void setGameDtoToGame(GameDtoToGame gameDtoToGame) {
@@ -38,16 +48,18 @@ public class RestGameController {
     }
 
     @Autowired
-    public void setGameService(GameService gameService) {
-        this.gameService = gameService;
+    public void setPlayerScoresRepository(PlayerScoresRepository playerScoresRepository) {
+        this.playerScoresRepository = playerScoresRepository;
     }
+
     @Autowired
-    public void setCommentService(CommentService commentService) {
-        this.commentService = commentService;
+    public void setGameRepository(GameRepository gameRepository) {
+        this.gameRepository = gameRepository;
     }
+
     @Autowired
-    public void setPlayerScoresService(PlayerScoresService playerScoresService) {
-        this.playerScoresService = playerScoresService;
+    public void setCommentRepository(CommentRepository commentRepository) {
+        this.commentRepository = commentRepository;
     }
 
     @GetMapping(path = {"/", ""})
@@ -63,26 +75,30 @@ public class RestGameController {
     }
 
     @GetMapping("date/{date}")
-    public List<Game> getGamesByDateWithPath(@PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") Date date ) {
-        return gameService.getByGameDate(date);
+    public List<Game> getGamesByDateWithPath(@PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") Date date) {
+        return gameRepository.findAll().stream().filter(e -> e.getGameDate() == date).collect(Collectors.toList());
     }
 
     @GetMapping("/game/{gameId}")
-    public Game getGameByIdWithPath(@PathVariable Integer gameId) {
-        if(gameService.getByGameId(gameId) != null) {
+    public GameDto getGameByIdWithPath(@PathVariable Integer gameId) {
+        if (gameRepository.findByGameId(gameId) != null) {
             System.out.println("found");
-            return gameService.getByGameId(gameId);
+            System.out.println(gameRepository.findByGameId(gameId));
+            System.out.println(gameToGameDto.convert(gameRepository.findByGameId(gameId)));
+            System.out.println(gameRepository.findByGameId(gameId).getPlayerScores());
+            return gameToGameDto.convert(gameRepository.findByGameId(gameId));
         } else {
             System.out.println("searching api");
             GameDto gameDto = rapidApiConnection.getGameById(gameId);
-            gameService.save(gameDtoToGame.convert(gameDto));
+            System.out.println(gameDto);
+            gameRepository.save(gameDtoToGame.convert(gameDto));
         }
         return null;
     }
 
     @GetMapping("game")
-    public Game getGameById(
-            @RequestParam(value = "gameid", required = true) Integer gameId){
+    public GameDto getGameById(
+            @RequestParam(value = "gameid", required = true) Integer gameId) {
         return getGameByIdWithPath(gameId);
     }
 }

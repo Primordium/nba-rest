@@ -29,6 +29,8 @@ public class GameToGameDto extends AbstractConverter<Game, GameDto>{
         gameDto.setGameId(game.getGameId());
         gameDto.setHomeTeamName(game.getHomeTeamName());
         gameDto.setVisitorTeamName(game.getVisitorTeamName());
+        gameDto.setHomeTeamScore(game.getHomeTeamScore());
+        gameDto.setVisitorTeamScore(game.getVisitorTeamScore());
         gameDto.setGameDate(game.getGameDate());
 
         gameDto.setPlayerScores(playerScoresToPlayerScoresDto.convert(game.getPlayerScores()));

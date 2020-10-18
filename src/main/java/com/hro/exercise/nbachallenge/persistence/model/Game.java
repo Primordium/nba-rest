@@ -35,7 +35,7 @@ public class Game extends AbstractModel {
             fetch = FetchType.LAZY,
             mappedBy = "game"
     )
-    private List<PlayerScores> playerScores;
+    private List<PlayerScores> playerScores = new ArrayList<>();
 
     @OneToMany(
             cascade = CascadeType.ALL,
