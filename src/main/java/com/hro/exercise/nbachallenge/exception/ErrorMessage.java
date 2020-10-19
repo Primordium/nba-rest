@@ -9,4 +9,5 @@ public class ErrorMessage {
     public static final String JSON_PARSE_PROBLEM = "There was a problem parsing the Json provided";
     public static final String COMMENT_NOT_FOUND = "The comment was not found";
     public static final String BAD_API_REQUEST = "Bad Api Request";
+    public static final String CONFIG_FILE_NOT_FOUND = "Missing config file";
 }

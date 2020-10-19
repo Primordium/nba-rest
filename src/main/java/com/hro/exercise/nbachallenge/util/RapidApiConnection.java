@@ -3,9 +3,9 @@ package com.hro.exercise.nbachallenge.util;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hro.exercise.nbachallenge.command.GameDto;
-import com.hro.exercise.nbachallenge.exception.ErrorMessage;
-import com.hro.exercise.nbachallenge.exception.NbaChallengeException;
+import com.hro.exercise.nbachallenge.exception.*;
 import com.hro.exercise.nbachallenge.persistence.model.Game;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -15,9 +15,11 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.file.Paths;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.DoubleToIntFunction;
 import java.util.stream.Collectors;
 
 @Component
@@ -27,7 +29,7 @@ public class RapidApiConnection {
     private ObjectMapper objectMapper = new ObjectMapper();
     private NbaApiParser nbaApiParser = new NbaApiParser();
 
-    private HttpResponse<String> openNbaApiConnection(String urlSuffix) throws NbaChallengeException {
+    private HttpResponse<String> openNbaApiConnection(String urlSuffix) throws ConfigFileNotFound, ApiConnectionFail {
         ObjectMapper objectMapper = new ObjectMapper();
 
         Map<?, ?> map = null;
@@ -44,20 +46,16 @@ public class RapidApiConnection {
                     .build();
 
             response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
-            if (response.body().isEmpty()) {
-                throw new NbaChallengeException(ErrorMessage.BAD_API_REQUEST);
-            }
-        } catch (IOException e) {
-            throw new NbaChallengeException(ErrorMessage.BAD_API_REQUEST);
-        } catch (InterruptedException e) {
 
-        } catch (NbaChallengeException e) {
-            e.printStackTrace();
+        } catch (IOException e) {
+            throw new ConfigFileNotFound();
+        } catch (InterruptedException e) {
+            throw new ApiConnectionFail();
         }
         return response;
     }
 
-    public List<GameDto> getGamesByDate(String date) throws NbaChallengeException {
+    public List<GameDto> getGamesByDate(String date) throws ApiConnectionFail, ConfigFileNotFound {
         String url = "games?page='%(pageNumber)'&per_page=100&dates[]=" + date;
         String currentUrl = url.replace("%(pageNumber)", "0");
         HttpResponse<String> response = openNbaApiConnection(currentUrl);
@@ -72,20 +70,26 @@ public class RapidApiConnection {
                 response = openNbaApiConnection(currentUrl);
             }
         } catch (JsonProcessingException e) {
-            throw new NbaChallengeException(ErrorMessage.JSON_PARSE_PROBLEM);
+            System.out.println(e.getMessage());
         }
 
-        List<GameDto> fullStatsList = gameDtoList.stream().map(ele ->
-                getGameById(ele.getGameId())).collect(Collectors.toList());
+        List<GameDto> fullStatsList = new ArrayList<>();
+        for (GameDto ele : gameDtoList) {
+            GameDto gameById = getGameById(ele.getGameId());
+            fullStatsList.add(gameById);
+        }
         fullStatsList.removeIf(e -> e.getGameId() == null);
 
         return fullStatsList;
     }
 
-    public GameDto getGameById(Integer gameId) {
+    public GameDto getGameById(Integer gameId) throws ApiConnectionFail {
         GameDto gameDto = new GameDto();
         try {
             HttpResponse<String> response = openNbaApiConnection("stats?page=0&per_page=100&game_ids[]=" + gameId);
+            if(response.statusCode() == 500 || response.statusCode() == 404 || objectMapper.readTree(response.body()).path("data").isEmpty() ) {
+                throw new BadApiRequest();
+            }
             gameDto.setPlayerScores(nbaApiParser.getPlayerScores(response));
             response = openNbaApiConnection("games/" + gameId);
             gameDto.setGameId(nbaApiParser.getGameId(response));
@@ -94,11 +98,10 @@ public class RapidApiConnection {
             gameDto.setHomeTeamScore(nbaApiParser.getHomeTeamScore(response));
             gameDto.setVisitorTeamScore(nbaApiParser.getVisitorTeamScore(response));
             gameDto.setGameDate(nbaApiParser.getGameDate(response));
-        } catch (JsonProcessingException e) {
         } catch (IOException e) {
         } catch (ParseException e) {
-        } catch (NbaChallengeException e) {
-            e.printStackTrace();
+        } catch (ConfigFileNotFound configFileNotFound) {
+        } catch (BadApiRequest badApiRequest) {
         }
         return gameDto;
     }
