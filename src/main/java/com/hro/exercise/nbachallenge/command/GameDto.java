@@ -7,6 +7,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -113,5 +114,13 @@ public class GameDto {
                 ", playerScores=" + playerScores.toString() +
                 ", comments=" + comments +
                 '}';
+    }
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) {return true;}
+        if (o instanceof GameDto && ((GameDto) o).gameId == this.gameId) {
+            return true;
+        }
+        return false;
     }
 }

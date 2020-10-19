@@ -1,6 +1,7 @@
 package com.hro.exercise.nbachallenge.persistence.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.hro.exercise.nbachallenge.command.CommentDto;
 import org.springframework.core.Ordered;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -137,5 +138,13 @@ public class Game extends AbstractModel {
                 '}';
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) {return true;}
+        if (o instanceof Game &&  (((Game) o).gameId) == this.gameId) {
+            return true;
+        }
+        return false;
+    }
 
 }

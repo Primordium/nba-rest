@@ -3,6 +3,7 @@ package com.hro.exercise.nbachallenge.util;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hro.exercise.nbachallenge.command.GameDto;
+import com.hro.exercise.nbachallenge.persistence.model.Game;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -12,7 +13,10 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.file.Paths;
 import java.text.ParseException;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Component
 public class RapidApiConnection {
@@ -50,22 +54,18 @@ public class RapidApiConnection {
     public void getAllGames() throws IOException {
 
 
-/*        System.out.println(response.body());
-
-        NbaApiParser nbaApiParser = new NbaApiParser();
-        nbaApiParser.getPlayerScores(response);*/
-
     }
 
-    public void getGamesByDate(String date) {
-        String url = "games?page='%(pageNumber)'&per_page=100&dates[]="+date;
+    public List<GameDto> getGamesByDate(String date) {
+        String url = "games?page='%(pageNumber)'&per_page=100&dates[]=" + date;
         String currentUrl = url.replace("%(pageNumber)", "0");
         HttpResponse<String> response = openNbaApiConnection(currentUrl);
+        List<GameDto> gameDtoList = new LinkedList<>();
         try {
             int total_pages = objectMapper.readTree(response.body()).findPath("meta").findPath("total_pages").asInt();
             int currentPage = objectMapper.readTree(response.body()).findPath("meta").findPath("current_page").asInt();
-            while(currentPage <= total_pages) {
-                nbaApiParser.getAllStatsByDate(response);
+            while (currentPage <= total_pages) {
+                gameDtoList.addAll(nbaApiParser.getAllStatsByDate(response));
                 currentPage++;
                 currentUrl = url.replace("%(pageNumber)", Integer.toString(currentPage));
                 response = openNbaApiConnection(currentUrl);
@@ -73,6 +73,12 @@ public class RapidApiConnection {
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
+
+        List<GameDto> fullStatsList = gameDtoList.stream().map(ele ->
+                getGameById(ele.getGameId())).collect(Collectors.toList());
+        fullStatsList.removeIf(e -> e.getGameId() == null);
+
+        return fullStatsList;
     }
 
     public GameDto getGameById(Integer gameId) {
@@ -88,11 +94,8 @@ public class RapidApiConnection {
             gameDto.setVisitorTeamScore(nbaApiParser.getVisitorTeamScore(response));
             gameDto.setGameDate(nbaApiParser.getGameDate(response));
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
         } catch (IOException e) {
-            e.printStackTrace();
         } catch (ParseException e) {
-            e.printStackTrace();
         }
         return gameDto;
     }

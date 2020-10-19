@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -69,25 +71,29 @@ public class RestGameController {
 
 
     @GetMapping("/date")
-    public List<Game> getGamesByDate(
+    public List<GameDto> getGamesByDate(
             @RequestParam(value = "date", required = true) @DateTimeFormat(pattern = "yyyy-MM-dd") Date date) {
         return getGamesByDateWithPath(date);
     }
 
     @GetMapping("date/{date}")
-    public List<Game> getGamesByDateWithPath(@PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") Date date) {
-        List<Game> games = gameRepository.findAll().stream().filter(e -> e.getGameDate().equals(date)).collect(Collectors.toList());
-        return games;
+    public List<GameDto> getGamesByDateWithPath(@PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") Date date) {
+        List<Game> dbList = gameRepository.findByGameDate(date);
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        List<GameDto> apiList = rapidApiConnection.getGamesByDate(dateFormat.format(date));
+        if(apiList.size() > dbList.size()) {
+            gameRepository.saveAll(gameDtoToGame.convert(apiList));
+            gameRepository.flush();
+        }
+        return gameToGameDto.convert(gameRepository.findByGameDate(date));
 
     }
 
     @GetMapping("/game/{gameId}")
     public GameDto getGameByIdWithPath(@PathVariable Integer gameId) {
         if (gameRepository.findByGameId(gameId) != null) {
-            System.out.println("found");
             return gameToGameDto.convert(gameRepository.findByGameId(gameId));
         } else {
-            System.out.println("searching api");
             GameDto gameDto = rapidApiConnection.getGameById(gameId);
             gameRepository.save(gameDtoToGame.convert(gameDto));
             return gameDto;

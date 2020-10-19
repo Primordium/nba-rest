@@ -53,4 +53,12 @@ public class CommentDto {
                 ", date=" + date +
                 '}';
     }
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) {return true;}
+        if (o instanceof CommentDto &&  (((CommentDto) o).id) == this.id) {
+            return true;
+        }
+        return false;
+    }
 }
