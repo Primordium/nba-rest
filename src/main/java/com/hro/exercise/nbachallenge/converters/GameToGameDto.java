@@ -3,9 +3,12 @@ package com.hro.exercise.nbachallenge.converters;
 import com.hro.exercise.nbachallenge.command.GameDto;
 import com.hro.exercise.nbachallenge.persistence.model.Game;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
-
+/**
+ * A {@link Converter} implementation, responsible for {@link Game} to {@link GameDto} type conversion
+ */
 @Component
 public class GameToGameDto extends AbstractConverter<Game, GameDto>{
     private CommentToCommentDto commentToCommentDto;

@@ -5,7 +5,12 @@ import com.hro.exercise.nbachallenge.persistence.dao.GameRepository;
 import com.hro.exercise.nbachallenge.persistence.dao.PlayerScoresRepository;
 import com.hro.exercise.nbachallenge.persistence.model.PlayerScores;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
+
+/**
+ * A {@link Converter} implementation, responsible for {@link PlayerScoresDto} to {@link PlayerScores} type conversion
+ */
 
 @Component
 public class PlayerScoresDtoToPlayerScores extends AbstractConverter<PlayerScoresDto, PlayerScores>{

@@ -5,10 +5,14 @@ import com.hro.exercise.nbachallenge.persistence.dao.GameRepository;
 import com.hro.exercise.nbachallenge.persistence.model.Comment;
 import com.hro.exercise.nbachallenge.persistence.model.Game;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 
+/**
+ * A {@link Converter} implementation, responsible for {@link GameDto} to {@link Game} type conversion
+ */
 @Component
 public class GameDtoToGame extends AbstractConverter<GameDto, Game> {
 
