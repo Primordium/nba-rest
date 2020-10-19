@@ -1,8 +1,12 @@
 package com.hro.exercise.nbachallenge.command;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+/**
+ * PlayerScores Dto
+ * Assures security/filter when providing PlayerScores data to the user
+ */
 
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class PlayerScoresDto {

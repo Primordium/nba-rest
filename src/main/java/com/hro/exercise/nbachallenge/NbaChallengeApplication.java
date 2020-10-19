@@ -1,9 +1,11 @@
 package com.hro.exercise.nbachallenge;
 
 import com.hro.exercise.nbachallenge.exception.NbaChallengeException;
+import com.hro.exercise.nbachallenge.persistence.dao.PlayerScoresRepository;
 import com.hro.exercise.nbachallenge.persistence.model.Game;
 import com.hro.exercise.nbachallenge.persistence.model.PlayerScores;
 import com.hro.exercise.nbachallenge.util.RapidApiConnection;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -24,6 +26,8 @@ public class NbaChallengeApplication {
             rapidApiConnectionTest.getGamesByDate("2019-03-30");
             Game game = new Game();
             PlayerScores playerScores = new PlayerScores();
+
+
 
         } catch (NbaChallengeException e) {
             e.printStackTrace();

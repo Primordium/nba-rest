@@ -7,13 +7,15 @@ import org.springframework.format.annotation.DateTimeFormat;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
+
+/**
+ * Game Dto
+ * Assures security/filter when providing game data to the user
+ */
 
 public class GameDto {
 
-    //@NotNull
     private Integer id;
 
     private Integer gameId;

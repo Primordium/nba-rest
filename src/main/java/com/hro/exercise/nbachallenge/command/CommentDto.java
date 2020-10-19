@@ -8,6 +8,10 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import java.util.Date;
 
+/**
+ * Comment Dto
+ * Assures security/filter when providing comment data to the user
+ */
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class CommentDto {
 
