@@ -48,7 +48,7 @@ public class RestCommentController {
      * @return Response Entity
      */
     @PostMapping("comments/{gameId}")
-    public ResponseEntity<?> getCommentsForGameId(@PathVariable Integer gameId, @RequestBody String comment) {
+    public ResponseEntity<?> postCommentsForGameId(@PathVariable Integer gameId, @RequestBody String comment) {
         Game game = gameRepository.findByGameId(gameId);
         if (game == null) {
             log.warn("WARNING : Comment(" + comment + ") could not be added to please check game ID");

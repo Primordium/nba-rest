@@ -41,6 +41,7 @@ public class RapidApiConnection {
         HttpResponse<String> response = null;
 
         try {
+            log.info("Oppening api config file");
             map = objectMapper.readValue(Paths.get("src\\main\\resources\\conf\\apiconf.json").toFile(), Map.class);
 
             HttpRequest request = HttpRequest.newBuilder()
@@ -64,8 +65,14 @@ public class RapidApiConnection {
         String url = "games?page='%(pageNumber)'&per_page=100&dates[]=" + date;
         String currentUrl = url.replace("%(pageNumber)", "0");
         HttpResponse<String> response = openNbaApiConnection(currentUrl);
+
+
         List<GameDto> gameDtoList = new LinkedList<>();
         try {
+            if(response.statusCode() == 500 || response.statusCode() == 404 || objectMapper.readTree(response.body()).path("data").isEmpty() ) {
+                log.warn("API: Game with " + date + " was not found");
+                throw new BadApiRequest();
+            }
             int total_pages = objectMapper.readTree(response.body()).findPath("meta").findPath("total_pages").asInt();
             int currentPage = objectMapper.readTree(response.body()).findPath("meta").findPath("current_page").asInt();
             while (currentPage <= total_pages) {
@@ -75,7 +82,9 @@ public class RapidApiConnection {
                 response = openNbaApiConnection(currentUrl);
             }
         } catch (JsonProcessingException e) {
-            log.warn(new JsonProcessingFailure().getMessage());
+            log.error(new JsonProcessingFailure().getMessage());
+        } catch (BadApiRequest badApiRequest) {
+            log.error(badApiRequest.getMessage());
         }
 
         List<GameDto> fullStatsList = new ArrayList<>();
@@ -83,8 +92,9 @@ public class RapidApiConnection {
             GameDto gameById = getGameById(ele.getGameId());
             fullStatsList.add(gameById);
         }
+        // To many requests ??
+        log.info("Api connection done, returning games with " + date + ".");
         fullStatsList.removeIf(e -> e.getGameId() == null);
-
         return fullStatsList;
     }
 
@@ -93,6 +103,7 @@ public class RapidApiConnection {
         try {
             HttpResponse<String> response = openNbaApiConnection("stats?page=0&per_page=100&game_ids[]=" + gameId);
             if(response.statusCode() == 500 || response.statusCode() == 404 || objectMapper.readTree(response.body()).path("data").isEmpty() ) {
+                log.warn("API: Game with " + gameId + " was not found");
                 throw new BadApiRequest();
             }
             gameDto.setPlayerScores(nbaApiParser.getPlayerScores(response));
@@ -104,14 +115,14 @@ public class RapidApiConnection {
             gameDto.setVisitorTeamScore(nbaApiParser.getVisitorTeamScore(response));
             gameDto.setGameDate(nbaApiParser.getGameDate(response));
         } catch (IOException e) {
-            log.warn("IOException in RapidApiConnection#getGameById");
+            log.error("IOException in RapidApiConnection#getGameById");
             e.printStackTrace();
         } catch (ParseException e) {
-            log.warn(new JsonProcessingFailure().getMessage());
+            log.error(new JsonProcessingFailure().getMessage());
         } catch (ConfigFileNotFound configFileNotFound) {
-            log.warn(configFileNotFound.getMessage());
+            log.error(configFileNotFound.getMessage());
         } catch (BadApiRequest badApiRequest) {
-            log.warn(badApiRequest.getMessage());
+            log.error(badApiRequest.getMessage());
         }
         return gameDto;
     }
