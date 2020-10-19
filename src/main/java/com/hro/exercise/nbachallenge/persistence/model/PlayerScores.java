@@ -2,12 +2,11 @@ package com.hro.exercise.nbachallenge.persistence.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.springframework.core.Ordered;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.persistence.*;
-import java.util.Optional;
-
+/**
+ * The PlayerScores model entity
+ */
 @Entity
 @Table
 public class PlayerScores extends AbstractModel{

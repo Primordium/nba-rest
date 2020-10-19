@@ -3,8 +3,12 @@ package com.hro.exercise.nbachallenge.util;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hro.exercise.nbachallenge.command.GameDto;
+import com.hro.exercise.nbachallenge.controller.rest.RestCommentController;
+import com.hro.exercise.nbachallenge.controller.rest.RestGameController;
 import com.hro.exercise.nbachallenge.exception.*;
 import com.hro.exercise.nbachallenge.persistence.model.Game;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
@@ -28,6 +32,7 @@ public class RapidApiConnection {
     private final String api_url = "https://rapidapi.p.rapidapi.com/";
     private ObjectMapper objectMapper = new ObjectMapper();
     private NbaApiParser nbaApiParser = new NbaApiParser();
+    private static final Logger log = LoggerFactory.getLogger(RestCommentController.class);
 
     private HttpResponse<String> openNbaApiConnection(String urlSuffix) throws ConfigFileNotFound, ApiConnectionFail {
         ObjectMapper objectMapper = new ObjectMapper();
@@ -70,7 +75,7 @@ public class RapidApiConnection {
                 response = openNbaApiConnection(currentUrl);
             }
         } catch (JsonProcessingException e) {
-            System.out.println(e.getMessage());
+            log.warn(new JsonProcessingFailure().getMessage());
         }
 
         List<GameDto> fullStatsList = new ArrayList<>();
@@ -99,9 +104,14 @@ public class RapidApiConnection {
             gameDto.setVisitorTeamScore(nbaApiParser.getVisitorTeamScore(response));
             gameDto.setGameDate(nbaApiParser.getGameDate(response));
         } catch (IOException e) {
+            log.warn("IOException in RapidApiConnection#getGameById");
+            e.printStackTrace();
         } catch (ParseException e) {
+            log.warn(new JsonProcessingFailure().getMessage());
         } catch (ConfigFileNotFound configFileNotFound) {
+            log.warn(configFileNotFound.getMessage());
         } catch (BadApiRequest badApiRequest) {
+            log.warn(badApiRequest.getMessage());
         }
         return gameDto;
     }
