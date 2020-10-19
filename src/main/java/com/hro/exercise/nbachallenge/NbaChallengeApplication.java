@@ -1,5 +1,6 @@
 package com.hro.exercise.nbachallenge;
 
+import com.hro.exercise.nbachallenge.exception.NbaChallengeException;
 import com.hro.exercise.nbachallenge.persistence.model.Game;
 import com.hro.exercise.nbachallenge.persistence.model.PlayerScores;
 import com.hro.exercise.nbachallenge.util.RapidApiConnection;
@@ -20,12 +21,11 @@ public class NbaChallengeApplication {
         RapidApiConnection rapidApiConnectionTest = new RapidApiConnection();
 
         try {
-            rapidApiConnectionTest.getAllGames();
             rapidApiConnectionTest.getGamesByDate("2019-03-30");
             Game game = new Game();
             PlayerScores playerScores = new PlayerScores();
 
-        } catch (IOException e) {
+        } catch (NbaChallengeException e) {
             e.printStackTrace();
         }
     }

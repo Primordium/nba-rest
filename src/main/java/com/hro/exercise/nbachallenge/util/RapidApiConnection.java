@@ -3,6 +3,8 @@ package com.hro.exercise.nbachallenge.util;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hro.exercise.nbachallenge.command.GameDto;
+import com.hro.exercise.nbachallenge.exception.ErrorMessage;
+import com.hro.exercise.nbachallenge.exception.NbaChallengeException;
 import com.hro.exercise.nbachallenge.persistence.model.Game;
 import org.springframework.stereotype.Component;
 
@@ -23,9 +25,9 @@ public class RapidApiConnection {
 
     private final String api_url = "https://rapidapi.p.rapidapi.com/";
     private ObjectMapper objectMapper = new ObjectMapper();
-    NbaApiParser nbaApiParser = new NbaApiParser();
+    private NbaApiParser nbaApiParser = new NbaApiParser();
 
-    private HttpResponse<String> openNbaApiConnection(String urlSuffix) {
+    private HttpResponse<String> openNbaApiConnection(String urlSuffix) throws NbaChallengeException {
         ObjectMapper objectMapper = new ObjectMapper();
 
         Map<?, ?> map = null;
@@ -42,21 +44,20 @@ public class RapidApiConnection {
                     .build();
 
             response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.body().isEmpty()) {
+                throw new NbaChallengeException(ErrorMessage.BAD_API_REQUEST);
+            }
+        } catch (IOException e) {
+            throw new NbaChallengeException(ErrorMessage.BAD_API_REQUEST);
+        } catch (InterruptedException e) {
 
-        } catch (IOException | InterruptedException e) {
+        } catch (NbaChallengeException e) {
             e.printStackTrace();
         }
-
         return response;
     }
 
-
-    public void getAllGames() throws IOException {
-
-
-    }
-
-    public List<GameDto> getGamesByDate(String date) {
+    public List<GameDto> getGamesByDate(String date) throws NbaChallengeException {
         String url = "games?page='%(pageNumber)'&per_page=100&dates[]=" + date;
         String currentUrl = url.replace("%(pageNumber)", "0");
         HttpResponse<String> response = openNbaApiConnection(currentUrl);
@@ -71,7 +72,7 @@ public class RapidApiConnection {
                 response = openNbaApiConnection(currentUrl);
             }
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            throw new NbaChallengeException(ErrorMessage.JSON_PARSE_PROBLEM);
         }
 
         List<GameDto> fullStatsList = gameDtoList.stream().map(ele ->
@@ -82,9 +83,9 @@ public class RapidApiConnection {
     }
 
     public GameDto getGameById(Integer gameId) {
-        HttpResponse<String> response = openNbaApiConnection("stats?page=0&per_page=100&game_ids[]=" + gameId);
         GameDto gameDto = new GameDto();
         try {
+            HttpResponse<String> response = openNbaApiConnection("stats?page=0&per_page=100&game_ids[]=" + gameId);
             gameDto.setPlayerScores(nbaApiParser.getPlayerScores(response));
             response = openNbaApiConnection("games/" + gameId);
             gameDto.setGameId(nbaApiParser.getGameId(response));
@@ -96,6 +97,8 @@ public class RapidApiConnection {
         } catch (JsonProcessingException e) {
         } catch (IOException e) {
         } catch (ParseException e) {
+        } catch (NbaChallengeException e) {
+            e.printStackTrace();
         }
         return gameDto;
     }

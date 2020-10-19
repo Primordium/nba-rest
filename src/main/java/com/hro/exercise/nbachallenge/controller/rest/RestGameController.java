@@ -3,6 +3,7 @@ package com.hro.exercise.nbachallenge.controller.rest;
 import com.hro.exercise.nbachallenge.command.GameDto;
 import com.hro.exercise.nbachallenge.converters.GameDtoToGame;
 import com.hro.exercise.nbachallenge.converters.GameToGameDto;
+import com.hro.exercise.nbachallenge.exception.NbaChallengeException;
 import com.hro.exercise.nbachallenge.persistence.dao.CommentRepository;
 import com.hro.exercise.nbachallenge.persistence.dao.GameRepository;
 import com.hro.exercise.nbachallenge.persistence.dao.PlayerScoresRepository;
@@ -72,12 +73,12 @@ public class RestGameController {
 
     @GetMapping("/date")
     public List<GameDto> getGamesByDate(
-            @RequestParam(value = "date", required = true) @DateTimeFormat(pattern = "yyyy-MM-dd") Date date) {
+            @RequestParam(value = "date", required = true) @DateTimeFormat(pattern = "yyyy-MM-dd") Date date) throws NbaChallengeException {
         return getGamesByDateWithPath(date);
     }
 
     @GetMapping("date/{date}")
-    public List<GameDto> getGamesByDateWithPath(@PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") Date date) {
+    public List<GameDto> getGamesByDateWithPath(@PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") Date date) throws NbaChallengeException {
         List<Game> dbList = gameRepository.findByGameDate(date);
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         List<GameDto> apiList = rapidApiConnection.getGamesByDate(dateFormat.format(date));
