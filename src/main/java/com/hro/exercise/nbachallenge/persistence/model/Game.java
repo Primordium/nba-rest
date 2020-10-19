@@ -8,7 +8,9 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.persistence.*;
 import java.util.*;
-
+/**
+ * The game model entity
+ */
 @Entity
 @Table(name = "games")
 public class Game extends AbstractModel {
