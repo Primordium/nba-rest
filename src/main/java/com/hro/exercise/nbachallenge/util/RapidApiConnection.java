@@ -93,7 +93,7 @@ public class RapidApiConnection {
             fullStatsList.add(gameById);
         }
         // To many requests ??
-        log.info("Api connection done, returning games with " + date + ".");
+        // log.info("Api connection done, returning games with " + date + ".");
         fullStatsList.removeIf(e -> e.getGameId() == null);
         return fullStatsList;
     }

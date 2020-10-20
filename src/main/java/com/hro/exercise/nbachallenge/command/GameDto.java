@@ -6,6 +6,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -28,7 +29,7 @@ public class GameDto {
     private Integer visitorTeamScore;
     @JsonProperty
     private List<PlayerScoresDto> playerScores;
-    private List<CommentDto> comments;
+    private List<CommentDto> comments = new ArrayList<>();
 
     public Integer getId() {
         return id;

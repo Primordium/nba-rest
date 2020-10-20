@@ -1,6 +1,7 @@
 package com.hro.exercise.nbachallenge.command;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.hro.exercise.nbachallenge.persistence.model.Comment;
 import com.sun.istack.NotNull;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -13,7 +14,7 @@ import java.util.Date;
  * Assures security/filter when providing comment data to the user
  */
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class CommentDto {
+public class CommentDto implements Comparable<CommentDto>{
 
     private Integer id;
 
@@ -64,5 +65,11 @@ public class CommentDto {
             return true;
         }
         return false;
+    }
+    @Override
+    public int compareTo(CommentDto o) {
+        if (this.getDate() == null || o.getDate() == null)
+            return 0;
+        return getDate().compareTo(o.getDate());
     }
 }

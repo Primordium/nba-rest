@@ -17,8 +17,11 @@ import org.springframework.web.bind.annotation.*;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @RestController
@@ -144,7 +147,9 @@ public class RestGameController {
 
         if (gameRepository.findByGameId(gameId) != null) {
             log.info("GAME : The game with ID: " + gameId + " was found in Database");
-            return new ResponseEntity<>(gameToGameDto.convert(gameRepository.findByGameId(gameId)), HttpStatus.OK);
+            GameDto gameDto = gameToGameDto.convert(gameRepository.findByGameId(gameId));
+            Collections.reverse(gameDto.getComments());
+            return new ResponseEntity<>(gameDto, HttpStatus.OK);
         }
 
         try {
@@ -154,6 +159,7 @@ public class RestGameController {
                 return new ResponseEntity(HttpStatus.NOT_FOUND);
             }
             gameRepository.save(gameDtoToGame.convert(gameDto));
+            Collections.sort(gameDto.getComments(), Collections.reverseOrder());
             return new ResponseEntity<>(gameDto, HttpStatus.OK);
         } catch (ApiConnectionFail apiConnectionFail) {
             log.warn(apiConnectionFail.getMessage());

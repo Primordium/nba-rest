@@ -15,7 +15,6 @@ import java.util.*;
 @Table(name = "games")
 public class Game extends AbstractModel {
 
-
     @JsonProperty
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @Temporal(TemporalType.DATE)
@@ -47,19 +46,6 @@ public class Game extends AbstractModel {
     )
     private List<Comment> commentList = new ArrayList<>();
 
-    public void addComment(Comment comment) {
-        commentList.add(comment);
-    }
-
-    public void removeComment(Comment comment) {
-        commentList.remove(comment);
-        comment.setComment(null);
-    }
-
-    public void updateComment(Integer commentId, Comment comment) {
-        commentList.get(commentId).setComment(comment.getComment());
-    }
-
 
     public Date getGameDate() {
         return gameDate;
@@ -68,7 +54,6 @@ public class Game extends AbstractModel {
     public void setGameDate(Date date) {
         this.gameDate = date;
     }
-
 
     public String getHomeTeamName() {
         return homeTeamName;
@@ -126,6 +111,20 @@ public class Game extends AbstractModel {
         this.gameId = gameId;
     }
 
+    public void updateComment(Integer commentId, String commentNew) {
+        for (int i = 0; i < commentList.size(); i++) {
+            if(commentList.get(i).getId() == commentId) {
+                commentList.get(i).setComment(commentNew);
+                break;
+            }
+        }
+    }
+
+    public void removeComment(Integer commentId) {
+        commentList.removeIf(e -> e.getId() == commentId);
+    }
+
+
     @Override
     public String toString() {
         return "Game{" +
@@ -148,5 +147,4 @@ public class Game extends AbstractModel {
         }
         return false;
     }
-
 }

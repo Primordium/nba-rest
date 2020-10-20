@@ -1,7 +1,6 @@
 package com.hro.exercise.nbachallenge.controller.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hro.exercise.nbachallenge.command.PlayerScoresDto;
 import com.hro.exercise.nbachallenge.converters.GameDtoToGame;
 import com.hro.exercise.nbachallenge.converters.GameToGameDto;
 import com.hro.exercise.nbachallenge.converters.PlayerScoresDtoToPlayerScores;
@@ -11,19 +10,22 @@ import com.hro.exercise.nbachallenge.persistence.dao.GameRepository;
 import com.hro.exercise.nbachallenge.persistence.model.Comment;
 import com.hro.exercise.nbachallenge.persistence.model.Game;
 import com.hro.exercise.nbachallenge.util.RapidApiConnection;
+import net.bytebuddy.pool.TypePool;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
+import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 
-import javax.persistence.criteria.CriteriaBuilder;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -64,14 +66,12 @@ class RestCommentControllerTest {
     @MockBean
     private RapidApiConnection rapidApiConnection;
 
-    @MockBean
-    private List<Comment> commentList;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
         objectMapper = new ObjectMapper();
-        commentList = new LinkedList<>();
+        comment = new Comment();
     }
 
     @AfterEach
@@ -109,30 +109,20 @@ class RestCommentControllerTest {
         int invalidId = 888;
         when(commentRepository.findById(invalidId)).thenReturn(Optional.empty());
         mockMvc.perform(post("/comments/{commentId}", invalidId))
-               .andExpect(status()
-               .isNotFound());
+                .andExpect(status()
+                        .isNotFound());
     }
 
     @Test
     void deleteCommentByIdWithValidId() throws Exception {
         int validId = 888;
         int gameId = 555;
+        Comment commentTest = new Comment("aaa");
 
-        game.setGameId(gameId);
-        comment.setGame(game);
-        commentList.add(comment);
-        comment.setId(validId);
-
-        when(gameRepository.findByGameId(validId)).thenReturn(game);
-        when(comment.getGame()).thenReturn(game);
-        when(game.getGameId()).thenReturn(gameId);
+        when(commentRepository.findById(validId)).thenReturn(Optional.of(commentTest));
         when(commentRepository.getOne(validId)).thenReturn(comment);
-        when(game.getCommentList()).thenReturn(commentList);
-        when(comment.getId()).thenReturn(validId);
 
-        assertEquals(commentList.get(), validId);
-
-        mockMvc.perform(delete("/comments/{commentId}", validId))
+        mockMvc.perform(delete("/comments/{validId}", validId))
                 .andExpect(status().isOk());
 
         verify(commentRepository, times(1)).save(ArgumentMatchers.any(Comment.class));

@@ -11,7 +11,7 @@ import java.util.Date;
  */
 @Entity
 @Table(name = "comments")
-public class Comment extends AbstractModel {
+public class Comment extends AbstractModel implements Comparable<Comment>{
 
     private String comment;
 
@@ -30,6 +30,13 @@ public class Comment extends AbstractModel {
         this.comment = comment;
     }
 
+    /**
+     * Method used to change comment and reflect in commentList of game aswell
+     * @param comment
+     */
+    public void editComment(String comment) {
+        game.updateComment(this.getId(), comment);
+    }
     /**
      * Gets the comment
      * @return String with the comment
@@ -82,5 +89,10 @@ public class Comment extends AbstractModel {
                 '}';
     }
 
-
+    @Override
+    public int compareTo(Comment o) {
+        if (this.getDate() == null || o.getDate() == null)
+            return 0;
+        return getDate().compareTo(o.getDate());
+    }
 }
