@@ -130,7 +130,8 @@ class RestCommentControllerTest {
         when(game.getCommentList()).thenReturn(commentList);
         when(comment.getId()).thenReturn(validId);
 
-        assertEquals(comment.getId(), validId);
+        assertEquals(commentList.get(), validId);
+
         mockMvc.perform(delete("/comments/{commentId}", validId))
                 .andExpect(status().isOk());
 
