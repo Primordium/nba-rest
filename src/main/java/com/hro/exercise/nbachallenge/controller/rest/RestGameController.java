@@ -10,12 +10,19 @@ import com.hro.exercise.nbachallenge.util.RapidApiConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.Errors;
+import org.springframework.validation.ObjectError;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.websocket.OnMessage;
+import java.io.IOException;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Comparator;
@@ -36,6 +43,7 @@ public class RestGameController {
 
     /**
      * Sets the game to gameDto converter
+     *
      * @param gameToGameDto
      */
     @Autowired
@@ -45,6 +53,7 @@ public class RestGameController {
 
     /**
      * Sets the gameDtoToGame converter
+     *
      * @param gameDtoToGame
      */
     @Autowired
@@ -54,6 +63,7 @@ public class RestGameController {
 
     /**
      * Sets rapidApiConnection
+     *
      * @param rapidApiConnection
      */
     @Autowired
@@ -63,6 +73,7 @@ public class RestGameController {
 
     /**
      * Sets game repository
+     *
      * @param gameRepository
      */
     @Autowired
@@ -72,6 +83,7 @@ public class RestGameController {
 
     /**
      * Provides instructions for the use of the rest service
+     *
      * @return
      */
     @GetMapping(path = {"/", ""})
@@ -87,13 +99,11 @@ public class RestGameController {
     }
 
     /**
-     * @return
      * @see RestGameController#getGameByIdWithPath(Integer)
      */
-
     @GetMapping("/date")
     public ResponseEntity<List<GameDto>> getGamesByDate(
-            @RequestParam(value = "date", required = true) @DateTimeFormat(pattern = "yyyy-MM-dd") Date date) throws ApiConnectionFail, ConfigFileNotFound {
+            @RequestParam(value = "date", required = true) @DateTimeFormat(pattern = "yyyy-MM-dd") Date date) {
         return getGamesByDateWithPath(date);
     }
 
@@ -111,10 +121,10 @@ public class RestGameController {
      * Adds new games if needed;
      *
      * @param date
-     * @return ResponseEntity<List<GameDto>>
+     * @return ResponseEntity<List < GameDto>>
      */
     @GetMapping("date/{date}")
-    public ResponseEntity<List<GameDto>> getGamesByDateWithPath(@PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") Date date) throws ConfigFileNotFound, ApiConnectionFail {
+    public ResponseEntity<List<GameDto>> getGamesByDateWithPath(@PathVariable @Validated @DateTimeFormat(pattern = "yyyy-MM-dd") Date date) {
 
         log.info("Game : Searching games with date " + date + " in Database");
         List<Game> dbList = gameRepository.findByGameDate(date);
@@ -152,20 +162,15 @@ public class RestGameController {
             return new ResponseEntity<>(gameDto, HttpStatus.OK);
         }
 
-        try {
-            log.info("GAME : Searching the game with ID: " + gameId + " in API");
-            GameDto gameDto = rapidApiConnection.getGameById(gameId);
-            if (gameDto.getGameId() == null) {
-                return new ResponseEntity(HttpStatus.NOT_FOUND);
-            }
-            gameRepository.save(gameDtoToGame.convert(gameDto));
-            Collections.sort(gameDto.getComments(), Collections.reverseOrder());
-            return new ResponseEntity<>(gameDto, HttpStatus.OK);
-        } catch (ApiConnectionFail apiConnectionFail) {
-            log.warn(apiConnectionFail.getMessage());
+        log.info("GAME : Searching the game with ID: " + gameId + " in API");
+        GameDto gameDto = rapidApiConnection.getGameById(gameId);
+        if (gameDto.getGameId() == null) {
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity(HttpStatus.NOT_FOUND);
+        gameRepository.save(gameDtoToGame.convert(gameDto));
+        Collections.sort(gameDto.getComments(), Collections.reverseOrder());
+        return new ResponseEntity<>(gameDto, HttpStatus.OK);
+
     }
 }
-
 

@@ -1,5 +1,6 @@
 package com.hro.exercise.nbachallenge.command;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -10,13 +11,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class PlayerScoresDto {
-
+    @JsonIgnore
     private Integer id;
-    @JsonProperty
+    @JsonProperty("First Name")
     private String firstName;
-    @JsonProperty
+    @JsonProperty("Last Name")
     private String lastName;
-    @JsonProperty
+    @JsonProperty("Points")
     private Integer score;
 
     public String getFirstName() {

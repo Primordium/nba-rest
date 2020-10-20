@@ -69,7 +69,7 @@ public class RestCommentController {
 
         gameRepository.save(game);
         log.info("COMMENT :" + comment + " added to Game with ID: " + game.getGameId());
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     /**

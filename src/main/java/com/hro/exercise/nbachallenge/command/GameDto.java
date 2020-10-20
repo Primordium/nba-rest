@@ -1,6 +1,7 @@
 package com.hro.exercise.nbachallenge.command;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -16,19 +17,25 @@ import java.util.List;
  */
 
 public class GameDto {
-
+    @JsonIgnore
     private Integer id;
-
+    @JsonProperty("Game ID")
     private Integer gameId;
+    @JsonProperty("Date")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @Temporal(TemporalType.DATE)
     private Date gameDate;
+    @JsonProperty("Home Team")
     private String homeTeamName;
+    @JsonProperty("Visitor Team")
     private String visitorTeamName;
+    @JsonProperty("Home Team Score")
     private Integer homeTeamScore;
+    @JsonProperty("Visitor Team Score")
     private Integer visitorTeamScore;
-    @JsonProperty
+    @JsonProperty("Players that Scored")
     private List<PlayerScoresDto> playerScores;
+    @JsonProperty("Comments")
     private List<CommentDto> comments = new ArrayList<>();
 
     public Integer getId() {

@@ -20,12 +20,13 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 @WebMvcTest
@@ -36,6 +37,8 @@ class RestGameControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @MockBean
+    private Game game;
     @MockBean
     private CommentRepository commentRepository;
     @MockBean
@@ -66,20 +69,31 @@ class RestGameControllerTest {
 
     @Test
     void usageInstructions() throws Exception {
-        this.mockMvc.perform(get("http://localhost:8080/api/nbadb/")).andExpect(status().isOk());
+        mockMvc.perform(get("/api/nbadb/")).andExpect(status().isOk());
     }
 
     @Test
     void getGamesByDateValidDate() throws Exception {
-        String validDate = "1980-03-40";
-        List<Game> gameList = new LinkedList<>();
-        gameList.add(new Game());
-        List<GameDto> gameDtoList= new LinkedList<>();
-        gameDtoList.add(new GameDto());
+        String validDate = "1980-03-20";
 
-        when(gameRepository.findByGameDate(any())).thenReturn(gameList);
-        when(rapidApiConnection.getGamesByDate(validDate)).thenReturn(gameDtoList);
-        this.mockMvc.perform(get("http://localhost:8080/api/nbadb/{date}", validDate)).andExpect(status().isOk());
+        List<GameDto> gameDto = new ArrayList<>();
+        List<Game> dbList = new ArrayList<>();
+        dbList.add(game);
+
+        when(gameRepository.findByGameDate(any(Date.class))).thenReturn(dbList);
+        when(rapidApiConnection.getGamesByDate(validDate)).thenReturn(null);
+        when(gameToGameDto.convert(anyList())).thenReturn(gameDto);
+
+        mockMvc.perform(get("/api/nbadb/date/{date}", validDate)).andExpect(status().isOk());
+
+    }
+
+    @Test
+    void getGamesByDateInvalidDate() throws Exception {
+        String validDate = "1980111222-03-201123";
+
+        mockMvc.perform(get("/api/nbadb/date/{date}", validDate)).andExpect(status().isNotFound());
+
     }
 
     @Test

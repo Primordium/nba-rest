@@ -1,6 +1,5 @@
 package com.hro.exercise.nbachallenge.controller.rest;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hro.exercise.nbachallenge.converters.GameDtoToGame;
 import com.hro.exercise.nbachallenge.converters.GameToGameDto;
 import com.hro.exercise.nbachallenge.converters.PlayerScoresDtoToPlayerScores;
@@ -10,32 +9,21 @@ import com.hro.exercise.nbachallenge.persistence.dao.GameRepository;
 import com.hro.exercise.nbachallenge.persistence.model.Comment;
 import com.hro.exercise.nbachallenge.persistence.model.Game;
 import com.hro.exercise.nbachallenge.util.RapidApiConnection;
-import net.bytebuddy.pool.TypePool;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatchers;
-import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @WebMvcTest
 class RestCommentControllerTest {
@@ -43,16 +31,12 @@ class RestCommentControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @MockBean
-    private CommentRepository commentRepository;
-
-    @MockBean
-    private GameRepository gameRepository;
     @MockBean
     private Comment comment;
+    @MockBean
+    private CommentRepository commentRepository;
+    @MockBean
+    private GameRepository gameRepository;
     @MockBean
     private Game game;
     @MockBean
@@ -70,25 +54,38 @@ class RestCommentControllerTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
-        objectMapper = new ObjectMapper();
-        comment = new Comment();
-    }
-
-    @AfterEach
-    void tearDown() {
     }
 
     @Test
     void putCommentsForGameIdWithInvalidId() throws Exception {
         int invalidId = 888;
-        String comment = "aaahahah";
+        String commentSentence = "fake comment";
         when(gameRepository.findByGameId(invalidId)).thenReturn(null);
-        mockMvc.perform(put("/comments/edit/{gameId}", invalidId)
+        mockMvc.perform(put("/api/nbadb/comments/edit/{gameId}", invalidId)
                 .accept(MediaType.TEXT_PLAIN)
                 .contentType(MediaType.TEXT_PLAIN)
-                .content(comment))
+                .content(commentSentence))
                 .andExpect(status().isNotFound());
+        verify(commentRepository, times(1)).findById(invalidId);
+    }
 
+    @Test
+    void putCommentsForGameIdWithValidId() throws Exception {
+        int validId = 888;
+        String commentSentence = "fake comment";
+
+        when(commentRepository.findById(validId)).thenReturn(Optional.of(comment));
+        when(commentRepository.getOne(validId)).thenReturn(comment);
+        when(gameRepository.findByGameId(validId)).thenReturn(game);
+        when(comment.getGame()).thenReturn(game);
+
+        mockMvc.perform(put("/api/nbadb/comments/edit/{gameId}", validId)
+                .accept(MediaType.TEXT_PLAIN)
+                .contentType(MediaType.TEXT_PLAIN)
+                .content(commentSentence))
+                .andExpect(status().isOk());
+        verify(comment, times(1)).editComment(commentSentence);
+        verify(gameRepository, times(1)).save(game);
     }
 
     @Test
@@ -97,34 +94,53 @@ class RestCommentControllerTest {
         String comment = "aaahahah";
 
         when(gameRepository.findByGameId(invalidId)).thenReturn(null);
-        mockMvc.perform(post("/comments/{gameId}", invalidId)
+        mockMvc.perform(post("/api/nbadb/comments/{gameId}", invalidId)
                 .accept(MediaType.TEXT_PLAIN)
                 .contentType(MediaType.TEXT_PLAIN)
                 .content(comment))
                 .andExpect(status().isNotFound());
+        verify(gameRepository, times(1)).findByGameId(invalidId);
     }
+
+
+    @Test
+    void postCommentsForGameIdWithValidId() throws Exception {
+        int validId = 888;
+        String comment = "aaahahah";
+
+        when(gameRepository.findByGameId(validId)).thenReturn(game);
+        mockMvc.perform(post("/api/nbadb/comments/{gameId}", validId)
+                .accept(MediaType.TEXT_PLAIN)
+                .contentType(MediaType.TEXT_PLAIN)
+                .content(comment))
+                .andExpect(status().isCreated());
+        verify(gameRepository, times(1)).findByGameId(validId);
+        verify(gameRepository, times(1)).save(game);
+    }
+
 
     @Test
     void deleteCommentByIdWithInvalidId() throws Exception {
         int invalidId = 888;
         when(commentRepository.findById(invalidId)).thenReturn(Optional.empty());
-        mockMvc.perform(post("/comments/{commentId}", invalidId))
+        mockMvc.perform(delete("/api/nbadb/comments/{commentId}", invalidId))
                 .andExpect(status()
                         .isNotFound());
+        verify(commentRepository, times(1)).findById(invalidId);
     }
 
     @Test
     void deleteCommentByIdWithValidId() throws Exception {
-        int validId = 888;
-        int gameId = 555;
-        Comment commentTest = new Comment("aaa");
+        Integer commentId = 888;
 
-        when(commentRepository.findById(validId)).thenReturn(Optional.of(commentTest));
-        when(commentRepository.getOne(validId)).thenReturn(comment);
+        when(commentRepository.findById(commentId)).thenReturn(Optional.of(comment));
+        when(comment.getGame()).thenReturn(game);
 
-        mockMvc.perform(delete("/comments/{validId}", validId))
-                .andExpect(status().isOk());
-
-        verify(commentRepository, times(1)).save(ArgumentMatchers.any(Comment.class));
+        when(commentRepository.getOne(commentId)).thenReturn(comment);
+        when(comment.getGame()).thenReturn(game);
+        mockMvc.perform(delete("/api/nbadb/comments/{commentId}", commentId))
+                .andExpect(status()
+                        .isOk());
+        verify(gameRepository, times(1)).save(game);
     }
 }

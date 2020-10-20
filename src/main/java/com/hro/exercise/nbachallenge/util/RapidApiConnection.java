@@ -11,7 +11,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.support.StandardMultipartHttpServletRequest;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -30,19 +32,27 @@ import java.util.stream.Collectors;
 public class RapidApiConnection {
 
     private final String api_url = "https://rapidapi.p.rapidapi.com/";
-    private ObjectMapper objectMapper = new ObjectMapper();
-    private NbaApiParser nbaApiParser = new NbaApiParser();
+    private ObjectMapper objectMapper;
+    private NbaApiParser nbaApiParser;
+    private File configFile;
     private static final Logger log = LoggerFactory.getLogger(RestCommentController.class);
 
-    private HttpResponse<String> openNbaApiConnection(String urlSuffix) throws ConfigFileNotFound, ApiConnectionFail {
-        ObjectMapper objectMapper = new ObjectMapper();
+
+    public RapidApiConnection() {
+        log.info("Opening api config file");
+        configFile = Paths.get("src\\main\\resources\\conf\\apiconf.json").toFile();
+        this.objectMapper = new ObjectMapper();
+        this.nbaApiParser = new NbaApiParser(objectMapper);
+    }
+
+
+    private HttpResponse<String> openNbaApiConnection(String urlSuffix) {
 
         Map<?, ?> map = null;
         HttpResponse<String> response = null;
-
         try {
-            log.info("Oppening api config file");
-            map = objectMapper.readValue(Paths.get("src\\main\\resources\\conf\\apiconf.json").toFile(), Map.class);
+
+            map = objectMapper.readValue(configFile, Map.class);
 
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(api_url + urlSuffix))
@@ -54,25 +64,30 @@ public class RapidApiConnection {
             response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
 
         } catch (IOException e) {
-            throw new ConfigFileNotFound();
+            log.error("Config file not found");
         } catch (InterruptedException e) {
-            throw new ApiConnectionFail();
+            System.out.println(new ApiConnectionFail().getMessage());
+            log.error("Connection to Api has failed");
         }
         return response;
     }
 
-    public List<GameDto> getGamesByDate(String date) throws ApiConnectionFail, ConfigFileNotFound {
+    public List<GameDto> getGamesByDate(String date) {
+
         String url = "games?page='%(pageNumber)'&per_page=100&dates[]=" + date;
         String currentUrl = url.replace("%(pageNumber)", "0");
         HttpResponse<String> response = openNbaApiConnection(currentUrl);
 
-
         List<GameDto> gameDtoList = new LinkedList<>();
+
         try {
-            if(response.statusCode() == 500 || response.statusCode() == 404 || objectMapper.readTree(response.body()).path("data").isEmpty() ) {
+
+            if (response.statusCode() == 500 || response.statusCode() == 404 ||
+                    objectMapper.readTree(response.body()).path("data").isEmpty()) {
                 log.warn("API: Game with " + date + " was not found");
-                throw new BadApiRequest();
+                System.out.println(new BadApiRequest().getMessage());
             }
+
             int total_pages = objectMapper.readTree(response.body()).findPath("meta").findPath("total_pages").asInt();
             int currentPage = objectMapper.readTree(response.body()).findPath("meta").findPath("current_page").asInt();
             while (currentPage <= total_pages) {
@@ -83,8 +98,6 @@ public class RapidApiConnection {
             }
         } catch (JsonProcessingException e) {
             log.error(new JsonProcessingFailure().getMessage());
-        } catch (BadApiRequest badApiRequest) {
-            log.error(badApiRequest.getMessage());
         }
 
         List<GameDto> fullStatsList = new ArrayList<>();
@@ -92,20 +105,28 @@ public class RapidApiConnection {
             GameDto gameById = getGameById(ele.getGameId());
             fullStatsList.add(gameById);
         }
+
         // To many requests ??
         // log.info("Api connection done, returning games with " + date + ".");
         fullStatsList.removeIf(e -> e.getGameId() == null);
         return fullStatsList;
     }
 
-    public GameDto getGameById(Integer gameId) throws ApiConnectionFail {
+
+    public GameDto getGameById(Integer gameId) {
         GameDto gameDto = new GameDto();
+        HttpResponse<String> response = openNbaApiConnection("stats?page=0&per_page=100&game_ids[]=" + gameId);
+
         try {
-            HttpResponse<String> response = openNbaApiConnection("stats?page=0&per_page=100&game_ids[]=" + gameId);
-            if(response.statusCode() == 500 || response.statusCode() == 404 || objectMapper.readTree(response.body()).path("data").isEmpty() ) {
+            if (response.statusCode() == 500 || response.statusCode() == 404 || objectMapper.readTree(response.body()).path("data").isEmpty()) {
                 log.warn("API: Game with " + gameId + " was not found");
-                throw new BadApiRequest();
+                System.out.println(new BadApiRequest().getMessage());
             }
+        } catch (JsonProcessingException e) {
+            log.error(new JsonProcessingFailure().getMessage());
+        }
+
+        try {
             gameDto.setPlayerScores(nbaApiParser.getPlayerScores(response));
             response = openNbaApiConnection("games/" + gameId);
             gameDto.setGameId(nbaApiParser.getGameId(response));
@@ -114,15 +135,8 @@ public class RapidApiConnection {
             gameDto.setHomeTeamScore(nbaApiParser.getHomeTeamScore(response));
             gameDto.setVisitorTeamScore(nbaApiParser.getVisitorTeamScore(response));
             gameDto.setGameDate(nbaApiParser.getGameDate(response));
-        } catch (IOException e) {
-            log.error("IOException in RapidApiConnection#getGameById");
-            e.printStackTrace();
-        } catch (ParseException e) {
+        } catch (IOException | ParseException e) {
             log.error(new JsonProcessingFailure().getMessage());
-        } catch (ConfigFileNotFound configFileNotFound) {
-            log.error(configFileNotFound.getMessage());
-        } catch (BadApiRequest badApiRequest) {
-            log.error(badApiRequest.getMessage());
         }
         return gameDto;
     }
