@@ -78,12 +78,12 @@ public class NbaApiParser {
 
         List<PlayerAndScore> playerAndScoreList = objectMapper.readValue(json.toString(), new TypeReference<>() {
         });
-
+        System.out.println(playerAndScoreList);
         if(playerAndScoreList.isEmpty()) {
             return null;
         }
 
-        return playerAndScoreList.stream().filter(e -> e.getPts() > 0).map(ele -> {
+        return playerAndScoreList.stream().filter(e -> e.getPts() != null).filter(e -> e.getPts() > 0).map(ele -> {
             PlayerScoresDto playerScoresDto = new PlayerScoresDto();
             playerScoresDto.setFirstName(ele.getFirstName());
             playerScoresDto.setLastName(ele.getLastName());

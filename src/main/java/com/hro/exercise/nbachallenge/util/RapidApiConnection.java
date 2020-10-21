@@ -113,6 +113,7 @@ public class RapidApiConnection {
             if (response.statusCode() == 500 || response.statusCode() == 404 || objectMapper.readTree(response.body()).path("data").isEmpty()) {
                 log.warn("API: Game with " + gameId + " was not found");
                 System.out.println(new BadApiRequest().getMessage());
+                return null;
             }
         } catch (JsonProcessingException e) {
             log.error(new JsonProcessingFailure().getMessage());

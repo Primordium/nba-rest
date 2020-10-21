@@ -156,13 +156,12 @@ public class RestGameController {
 
         log.info("GAME : Searching the game with ID: " + gameId + " in API");
         GameDto gameDto = rapidApiConnection.getGameById(gameId);
-        if (gameDto.getGameId() == null) {
+        if (gameDto == null) {
             return new ResponseEntity("Couldn't find any game with provided ID", HttpStatus.NOT_FOUND);
         }
         gameRepository.save(gameDtoToGame.convert(gameDto));
         Collections.sort(gameDto.getComments(), Collections.reverseOrder());
         return new ResponseEntity<>(gameDto, HttpStatus.OK);
-
     }
 }
 
