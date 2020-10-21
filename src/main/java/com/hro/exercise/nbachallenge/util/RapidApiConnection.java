@@ -4,14 +4,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hro.exercise.nbachallenge.command.GameDto;
 import com.hro.exercise.nbachallenge.controller.rest.RestCommentController;
-import com.hro.exercise.nbachallenge.controller.rest.RestGameController;
 import com.hro.exercise.nbachallenge.exception.*;
-import com.hro.exercise.nbachallenge.persistence.model.Game;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-import org.springframework.web.multipart.support.StandardMultipartHttpServletRequest;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,8 +21,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.DoubleToIntFunction;
-import java.util.stream.Collectors;
 
 @Component
 public class RapidApiConnection {
@@ -116,7 +110,6 @@ public class RapidApiConnection {
     public GameDto getGameById(Integer gameId) {
         GameDto gameDto = new GameDto();
         HttpResponse<String> response = openNbaApiConnection("stats?page=0&per_page=100&game_ids[]=" + gameId);
-
         try {
             if (response.statusCode() == 500 || response.statusCode() == 404 || objectMapper.readTree(response.body()).path("data").isEmpty()) {
                 log.warn("API: Game with " + gameId + " was not found");
