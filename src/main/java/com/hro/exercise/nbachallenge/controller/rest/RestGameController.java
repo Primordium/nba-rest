@@ -3,32 +3,24 @@ package com.hro.exercise.nbachallenge.controller.rest;
 import com.hro.exercise.nbachallenge.command.GameDto;
 import com.hro.exercise.nbachallenge.converters.GameDtoToGame;
 import com.hro.exercise.nbachallenge.converters.GameToGameDto;
-import com.hro.exercise.nbachallenge.exception.*;
 import com.hro.exercise.nbachallenge.persistence.dao.GameRepository;
 import com.hro.exercise.nbachallenge.persistence.model.Game;
 import com.hro.exercise.nbachallenge.util.RapidApiConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
-import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.websocket.OnMessage;
-import java.io.IOException;
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 @RestController
@@ -102,7 +94,7 @@ public class RestGameController {
      * @see RestGameController#getGameByIdWithPath(Integer)
      */
     @GetMapping("/date")
-    public ResponseEntity<List<GameDto>> getGamesByDate(
+    public ResponseEntity<?> getGamesByDate(
             @RequestParam(value = "date", required = true) @DateTimeFormat(pattern = "yyyy-MM-dd") Date date) {
         return getGamesByDateWithPath(date);
     }
@@ -111,7 +103,7 @@ public class RestGameController {
      * @see RestGameController#getGameByIdWithPath(Integer)
      */
     @GetMapping("game")
-    public ResponseEntity<GameDto> getGameById(
+    public ResponseEntity<?> getGameById(
             @RequestParam(value = "gameid", required = true) Integer gameId) {
         return getGameByIdWithPath(gameId);
     }
@@ -124,7 +116,7 @@ public class RestGameController {
      * @return ResponseEntity<List < GameDto>>
      */
     @GetMapping("date/{date}")
-    public ResponseEntity<List<GameDto>> getGamesByDateWithPath(@PathVariable @Validated @DateTimeFormat(pattern = "yyyy-MM-dd") Date date) {
+    public ResponseEntity<?> getGamesByDateWithPath(@PathVariable @Validated @DateTimeFormat(pattern = "yyyy-MM-dd") Date date) {
 
         log.info("Game : Searching games with date " + date + " in Database");
         List<Game> dbList = gameRepository.findByGameDate(date);
@@ -141,7 +133,7 @@ public class RestGameController {
 
         if (apiList.isEmpty() && dbList.isEmpty()) {
             log.info("Game: There where no games to the given date: " + date);
-            return new ResponseEntity(HttpStatus.NOT_FOUND);
+            return new ResponseEntity("There where no games for the give date",HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity(gameToGameDto.convert(gameRepository.findByGameDate(date)), HttpStatus.OK);
     }
@@ -153,7 +145,7 @@ public class RestGameController {
      * @return ResponseEntity<GameDto>
      */
     @GetMapping("/game/{gameId}")
-    public ResponseEntity<GameDto> getGameByIdWithPath(@PathVariable Integer gameId) {
+    public ResponseEntity<?> getGameByIdWithPath(@PathVariable Integer gameId) {
 
         if (gameRepository.findByGameId(gameId) != null) {
             log.info("GAME : The game with ID: " + gameId + " was found in Database");
@@ -165,7 +157,7 @@ public class RestGameController {
         log.info("GAME : Searching the game with ID: " + gameId + " in API");
         GameDto gameDto = rapidApiConnection.getGameById(gameId);
         if (gameDto.getGameId() == null) {
-            return new ResponseEntity(HttpStatus.NOT_FOUND);
+            return new ResponseEntity("Couldn't find any game with provided ID", HttpStatus.NOT_FOUND);
         }
         gameRepository.save(gameDtoToGame.convert(gameDto));
         Collections.sort(gameDto.getComments(), Collections.reverseOrder());

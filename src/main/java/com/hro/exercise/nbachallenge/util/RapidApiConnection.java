@@ -34,7 +34,8 @@ public class RapidApiConnection {
 
     public RapidApiConnection() {
         log.info("Opening api config file");
-        configFile = Paths.get("src\\main\\resources\\conf\\apiconf.json").toFile();
+        // replace file with key for hardcoded key because docker
+        //configFile = Paths.get("src\\main\\resources\\conf\\apiconf.json").toFile();
         this.objectMapper = new ObjectMapper();
         this.nbaApiParser = new NbaApiParser(objectMapper);
     }
@@ -46,12 +47,10 @@ public class RapidApiConnection {
         HttpResponse<String> response = null;
         try {
 
-            map = objectMapper.readValue(configFile, Map.class);
-
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(api_url + urlSuffix))
                     .header("x-rapidapi-host", "free-nba.p.rapidapi.com")
-                    .header("x-rapidapi-key", (String) map.get("api_key"))
+                    .header("x-rapidapi-key", "c29e9e9b2fmshe04ede3c49d8164p1215edjsnf93801d1751d")
                     .method("GET", HttpRequest.BodyPublishers.noBody())
                     .build();
 

@@ -13,7 +13,6 @@ public class NbaChallengeApplication {
         // TODO Test db connection on start
 
         SpringApplication.run(NbaChallengeApplication.class, args);
-        RapidApiConnection rapidApiConnectionTest = new RapidApiConnection();
 
     }
 }

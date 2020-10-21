@@ -42,7 +42,8 @@ public class Game extends AbstractModel {
     @OneToMany(
             cascade = CascadeType.ALL,
             orphanRemoval = true,
-            fetch = FetchType.LAZY
+            fetch = FetchType.LAZY,
+            mappedBy = "game"
     )
     private List<Comment> commentList = new ArrayList<>();
 

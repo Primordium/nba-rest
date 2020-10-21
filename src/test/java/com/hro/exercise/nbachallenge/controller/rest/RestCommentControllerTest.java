@@ -61,7 +61,7 @@ class RestCommentControllerTest {
         int invalidId = 888;
         String commentSentence = "fake comment";
         when(gameRepository.findByGameId(invalidId)).thenReturn(null);
-        mockMvc.perform(put("/api/nbadb/comments/edit/{gameId}", invalidId)
+        mockMvc.perform(put("/api/nbadb/comments/{gameId}", invalidId)
                 .accept(MediaType.TEXT_PLAIN)
                 .contentType(MediaType.TEXT_PLAIN)
                 .content(commentSentence))
@@ -79,7 +79,7 @@ class RestCommentControllerTest {
         when(gameRepository.findByGameId(validId)).thenReturn(game);
         when(comment.getGame()).thenReturn(game);
 
-        mockMvc.perform(put("/api/nbadb/comments/edit/{gameId}", validId)
+        mockMvc.perform(put("/api/nbadb/comments/{gameId}", validId)
                 .accept(MediaType.TEXT_PLAIN)
                 .contentType(MediaType.TEXT_PLAIN)
                 .content(commentSentence))
@@ -114,7 +114,7 @@ class RestCommentControllerTest {
                 .contentType(MediaType.TEXT_PLAIN)
                 .content(comment))
                 .andExpect(status().isCreated());
-        verify(gameRepository, times(1)).findByGameId(validId);
+        verify(gameRepository, times(2)).findByGameId(validId);
         verify(gameRepository, times(1)).save(game);
     }
 
