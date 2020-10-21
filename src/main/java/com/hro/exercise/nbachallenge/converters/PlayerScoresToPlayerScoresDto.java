@@ -13,19 +13,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class PlayerScoresToPlayerScoresDto extends AbstractConverter<PlayerScores, PlayerScoresDto>{
 
-    GameToGameDto gameToGameDto;
-    GameRepository gameRepository;
-
-    @Autowired
-    public void setGameToGameDto(GameToGameDto gameToGameDto) {
-        this.gameToGameDto = gameToGameDto;
-    }
-
-    @Autowired
-    public void setGameRepository(GameRepository gameRepository) {
-        this.gameRepository = gameRepository;
-    }
-
     @Override
     public PlayerScoresDto convert(PlayerScores playerScores) {
         PlayerScoresDto playerScoresDto = new PlayerScoresDto();

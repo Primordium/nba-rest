@@ -128,9 +128,6 @@ public class GameDto {
     @Override
     public boolean equals(Object o) {
         if (o == this) {return true;}
-        if (o instanceof GameDto && ((GameDto) o).gameId == this.gameId) {
-            return true;
-        }
-        return false;
+        return o instanceof GameDto && ((GameDto) o).gameId == this.gameId;
     }
 }

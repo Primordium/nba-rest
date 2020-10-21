@@ -61,10 +61,7 @@ public class CommentDto implements Comparable<CommentDto>{
     @Override
     public boolean equals(Object o) {
         if (o == this) {return true;}
-        if (o instanceof CommentDto &&  (((CommentDto) o).id) == this.id) {
-            return true;
-        }
-        return false;
+        return o instanceof CommentDto && (((CommentDto) o).id) == this.id;
     }
     @Override
     public int compareTo(CommentDto o) {

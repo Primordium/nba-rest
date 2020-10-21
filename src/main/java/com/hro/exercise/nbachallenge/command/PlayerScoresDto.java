@@ -65,9 +65,6 @@ public class PlayerScoresDto {
     @Override
     public boolean equals(Object o) {
         if (o == this) {return true;}
-        if (o instanceof PlayerScoresDto &&  (((PlayerScoresDto) o).id) == this.id) {
-            return true;
-        }
-        return false;
+        return o instanceof PlayerScoresDto && (((PlayerScoresDto) o).id) == this.id;
     }
 }
