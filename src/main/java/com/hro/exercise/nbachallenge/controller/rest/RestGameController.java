@@ -85,7 +85,7 @@ public class RestGameController {
                 "GET date/{date} with yyyy-MM-dd format \n" +
                 "GET game/{gameId} where id is the game you searching for \n" +
                 "POST comments/{gameId} and in the body the text you want to post \n" +
-                "PUT comments/edit/{commentId} to edit the comment\n" +
+                "PUT comments/{commentId} to edit the comment\n" +
                 "DELETE comments/{commentId} to delete a specific comment \n" +
                 "", HttpStatus.OK);
     }
