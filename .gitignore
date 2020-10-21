@@ -31,3 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
+/src/main/java/com/hro/exercise/nbachallenge/util/NbaApiParser.java
+/out/
+/bin/

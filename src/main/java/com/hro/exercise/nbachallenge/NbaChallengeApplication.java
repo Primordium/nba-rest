@@ -1,18 +1,20 @@
 package com.hro.exercise.nbachallenge;
 
-import com.hro.exercise.nbachallenge.util.RapidApiConnectionTest;
+import com.hro.exercise.nbachallenge.util.RapidApiConnection;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+
 
 @SpringBootApplication
 public class NbaChallengeApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(NbaChallengeApplication.class, args);
-		RapidApiConnectionTest rapidApiConnectionTest = new RapidApiConnectionTest();
-		rapidApiConnectionTest.getAllGames();
-	}
+    public static void main(String[] args) {
 
+        // TODO Test db connection on start
 
+        SpringApplication.run(NbaChallengeApplication.class, args);
 
+    }
 }
+
+
