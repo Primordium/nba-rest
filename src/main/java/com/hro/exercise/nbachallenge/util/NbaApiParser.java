@@ -1,19 +1,12 @@
 package com.hro.exercise.nbachallenge.util;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hro.exercise.nbachallenge.command.GameDto;
 import com.hro.exercise.nbachallenge.command.PlayerScoresDto;
-import com.hro.exercise.nbachallenge.persistence.model.PlayerScores;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Component;
-
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import java.io.IOException;
 import java.net.http.HttpResponse;
 import java.text.ParseException;
