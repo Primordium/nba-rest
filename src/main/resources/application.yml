@@ -1,0 +1,42 @@
+#APP SPECIFIC CUSTOM PROPERTIES
+app:
+  name: spring boot api application
+  api:
+    title: Spring Boot APIs
+    version: 1.0.0
+    description: Spring Boot APIs description
+    base-package: com.example.api
+    contact-name: apisupportgroup
+    contact-email: apisupportgroup@abc.com
+    logging:
+      enable: false
+      url-patterns: "/api/nbadb/game/*,/api/nbadb/comments/*,/api/nbadb/date/*"
+      requestIdParamName: reqId
+    swagger:
+      enable: false
+server:
+  port: 8080
+logging:
+  level:
+    root: INFO
+    com.example.api.client: DEBUG
+  pattern:
+    #console: "%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"
+    console: "%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%8.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %X{REQUEST_ID} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 5000
+        readTimeout: 5000
+        loggerLevel: FULL
+spring:
+  jackson:
+    date-format: "dd-MM-yyyy hh:mm:ss"
+    serialization:
+      INDENT_OUTPUT: true
+      FAIL_ON_EMPTY_BEANS: false
+      WRITE_DATES_AS_TIMESTAMPS: false
+    deserialization:
+      FAIL_ON_UNKNOWN_PROPERTIES: false
+      FAIL_ON_IGNORED_PROPERTIES: false
