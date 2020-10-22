@@ -20,9 +20,12 @@ dev - will use h2 database, it's a memory sql database commonly used for testing
 prod - to use a mysql database, bellow there are instructions on how to run the program against a mysql db on docker
 
 ### dev profile
-After running the program database can be accessed on http://localhost:8080/h2-console/
+After running the program go to http://localhost:8080/h2-console/ to access the database. 
+
 Default user : sa 
-Password : {empty}
+
+Password : *empty*
+
 can be changed in application-dev.profile
 
 
