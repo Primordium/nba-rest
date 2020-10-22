@@ -75,7 +75,7 @@ public class NbaApiParser {
         if(gameStatsList.isEmpty()) {
             return null;
         }
-        
+
         return gameStatsList;
     }
 
