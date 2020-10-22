@@ -2,6 +2,7 @@ package com.hro.exercise.nbachallenge.command;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -10,28 +11,22 @@ import javax.persistence.TemporalType;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Game Dto
  * Assures security/filter when providing game data to the user
  */
-
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class GameDto {
+
     @JsonIgnore
     private Integer id;
-    @JsonProperty("Game ID")
     private Integer gameId;
-    @JsonProperty("Date")
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    @Temporal(TemporalType.DATE)
     private Date gameDate;
-    @JsonProperty("Home Team")
     private String homeTeamName;
-    @JsonProperty("Visitor Team")
     private String visitorTeamName;
-    @JsonProperty("Home Team Score")
     private Integer homeTeamScore;
-    @JsonProperty("Visitor Team Score")
     private Integer visitorTeamScore;
     @JsonProperty("Players that Scored")
     private List<PlayerScoresDto> playerScores;
@@ -41,47 +36,51 @@ public class GameDto {
     public Integer getId() {
         return id;
     }
-
     public void setId(Integer id) {
         this.id = id;
     }
 
+    @JsonProperty("Game ID")
     public Integer getGameId() {
         return gameId;
     }
-
+    @JsonProperty("id")
     public void setGameId(Integer gameId) {
         this.gameId = gameId;
     }
 
+    @JsonProperty("Home Team")
     public String getHomeTeamName() {
         return homeTeamName;
     }
-
     public void setHomeTeamName(String homeTeamName) {
         this.homeTeamName = homeTeamName;
     }
 
+    @JsonProperty("Visitor Team")
     public String getVisitorTeamName() {
         return visitorTeamName;
     }
-
     public void setVisitorTeamName(String visitorTeamName) {
         this.visitorTeamName = visitorTeamName;
     }
 
+    @JsonProperty("Home Team Score")
     public Integer getHomeTeamScore() {
         return homeTeamScore;
     }
 
+    @JsonProperty("home_team_score")
     public void setHomeTeamScore(Integer homeTeamScore) {
         this.homeTeamScore = homeTeamScore;
     }
 
+    @JsonProperty("Visitor Team Score")
     public Integer getVisitorTeamScore() {
         return visitorTeamScore;
     }
 
+    @JsonProperty("visitor_team_score")
     public void setVisitorTeamScore(Integer visitorTeamScore) {
         this.visitorTeamScore = visitorTeamScore;
     }
@@ -89,25 +88,38 @@ public class GameDto {
     public List<PlayerScoresDto> getPlayerScores() {
         return playerScores;
     }
-
     public void setPlayerScores(List<PlayerScoresDto> playerScores) {
         this.playerScores = playerScores;
     }
-
     public List<CommentDto> getComments() {
         return comments;
     }
+    public void setComments(List<CommentDto> comments) {
+        this.comments = comments;
+    }
 
+    @JsonProperty("Date")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @Temporal(TemporalType.DATE)
     public Date getGameDate() {
         return gameDate;
     }
 
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @Temporal(TemporalType.DATE)
+    @JsonProperty("date")
     public void setGameDate(Date gameDate) {
         this.gameDate = gameDate;
     }
 
-    public void setComments(List<CommentDto> comments) {
-        this.comments = comments;
+    @JsonProperty("home_team")
+    public void setHomeName(Map<String, String> homeTeam) {
+        setHomeTeamName(homeTeam.get("full_name"));
+    }
+
+    @JsonProperty("visitor_team")
+    public void setVisName(Map<String, String> visitorTeam) {
+        setVisitorTeamName(visitorTeam.get("full_name"));
     }
 
     @Override
