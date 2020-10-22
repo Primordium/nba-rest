@@ -5,6 +5,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
+/**
+ * Configuration Class
+ * If need to change what profile is running
+ * @see {src\main\resources\application.properties}
+ */
 @Configuration
 @ConfigurationProperties("spring.datasource")
 public class DBConfiguration {

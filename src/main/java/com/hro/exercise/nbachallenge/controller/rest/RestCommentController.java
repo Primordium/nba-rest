@@ -49,11 +49,21 @@ public class RestCommentController {
         this.commentRepository = commentRepository;
     }
 
+    /**
+     * Sets Api connection
+     *
+     * @param rapidApiConnection
+     */
     @Autowired
     public void setRapidApiConnection(RapidApiConnection rapidApiConnection) {
         this.rapidApiConnection = rapidApiConnection;
     }
 
+    /**
+     * Sets gameDto to Game converter
+     *
+     * @param gameDtoToGame
+     */
     @Autowired
     public void setGameDtoToGame(GameDtoToGame gameDtoToGame) {
         this.gameDtoToGame = gameDtoToGame;
@@ -105,7 +115,7 @@ public class RestCommentController {
         Collections.sort(game.getCommentList());
         commentRepository.save(cmnt);
         gameRepository.save(game);
-        log.info("COMMENT :'" + comment + "' added to Game with ID: '" + game.getGameId()+"'");
+        log.info("COMMENT :'" + comment + "' added to Game with ID: '" + game.getGameId() + "'");
         return new ResponseEntity<>("Your comment: '" + comment + "' had been added to the game with ID: " + gameId, HttpStatus.CREATED);
     }
 
@@ -131,7 +141,7 @@ public class RestCommentController {
 
         Comment comment = commentRepository.getOne(commentId);
         comment.editComment(commentNew);
-        log.info("COMMENT :" + commentNew + " replaced to the comment with ID: '" + commentId +"'");
+        log.info("COMMENT :" + commentNew + " replaced to the comment with ID: '" + commentId + "'");
         gameRepository.save(comment.getGame());
 
         return new ResponseEntity<>("Your comment :'" + commentNew + "' replaced to the comment with ID: " + commentId, HttpStatus.OK);

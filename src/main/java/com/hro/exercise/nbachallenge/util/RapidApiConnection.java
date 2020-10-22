@@ -28,8 +28,9 @@ public class RapidApiConnection {
     private final String api_url = "https://rapidapi.p.rapidapi.com/";
     private ObjectMapper objectMapper;
     private NbaApiParser nbaApiParser;
-    private File configFile;
     private static final Logger log = LoggerFactory.getLogger(RestCommentController.class);
+    // Was in use, before docker, will try to implement again.
+    private File configFile;
 
 
     public RapidApiConnection() {
@@ -40,6 +41,12 @@ public class RapidApiConnection {
         this.nbaApiParser = new NbaApiParser(objectMapper);
     }
 
+
+    /**
+     * Opens a connection and retrieves the body of the request done to RapidApi
+     * @param urlSuffix used by other methods to search Api for specific data
+     * @return HttpResponse with contents of the request
+     */
 
     private HttpResponse<String> openNbaApiConnection(String urlSuffix) {
 
@@ -64,6 +71,14 @@ public class RapidApiConnection {
         }
         return response;
     }
+
+    /**
+     * Searches Rapid Api for a specific date, after getting all gameIds
+     * invokes getGameById to retrieve the gameDtos
+     * @see RapidApiConnection#getGameById(Integer);
+     * @param date to search for
+     * @return List GameDtos
+     */
 
     public List<GameDto> getGamesByDate(String date) {
 
@@ -105,7 +120,12 @@ public class RapidApiConnection {
         return fullStatsList;
     }
 
-
+    /**
+     * Method to search Rapid Api for a gameId return a gameDto
+     * @see NbaApiParser
+     * @param gameId the id to search for
+     * @return gameDto if present null if not
+     */
     public GameDto getGameById(Integer gameId) {
         GameDto gameDto = new GameDto();
         HttpResponse<String> response = openNbaApiConnection("stats?page=0&per_page=100&game_ids[]=" + gameId);

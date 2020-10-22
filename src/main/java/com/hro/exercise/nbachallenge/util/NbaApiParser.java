@@ -20,6 +20,9 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Provides specific methods to retrieve values in certain fields of a Json
+ */
 @Component
 public class NbaApiParser {
 
@@ -56,43 +59,63 @@ public class NbaApiParser {
         return objectMapper.readTree(response.body()).path("visitor_team_score").asInt();
     }
 
+    /**
+     * Method to create a list of Game Dtos for a specific date
+     *
+     * @param response HttpRequest provided by NbaApiParser
+     * @return List<GameDto> if present
+     * @throws JsonProcessingException
+     */
     public List<GameDto> getAllStatsByDate(HttpResponse<String> response) throws JsonProcessingException {
         JsonNode jsonNode = objectMapper.readTree(response.body()).findPath("data");
         List<GameStats> gameStatsList = objectMapper.readValue(jsonNode.toString(), new TypeReference<>() {
         });
 
         return gameStatsList.stream().map(ele -> {
-                    GameDto gameDto = new GameDto();
-                    gameDto.setGameId(ele.gameId);
-                    gameDto.setHomeTeamName(ele.getHomeTeamName());
-                    gameDto.setVisitorTeamName(ele.getVisitorTeamName());
-                    gameDto.setHomeTeamScore(ele.getHomeTeamScore());
-                    gameDto.setVisitorTeamScore(ele.getVisitorTeamScore());
-                    gameDto.setGameDate(ele.getGameDate());
-                    return gameDto;
-                }).collect(Collectors.toList());
+            GameDto gameDto = new GameDto();
+            gameDto.setGameId(ele.gameId);
+            gameDto.setHomeTeamName(ele.getHomeTeamName());
+            gameDto.setVisitorTeamName(ele.getVisitorTeamName());
+            gameDto.setHomeTeamScore(ele.getHomeTeamScore());
+            gameDto.setVisitorTeamScore(ele.getVisitorTeamScore());
+            gameDto.setGameDate(ele.getGameDate());
+            return gameDto;
+        }).collect(Collectors.toList());
     }
 
+    /**
+     * Method to retrieve the players and their scores, since RapicApi doesn't provide both values
+     * in the same object
+     *
+     * @param response HttpRequest provided by NbaRapidConnection
+     * @return List<PlayerScoresDto>
+     * @throws IOException
+     */
     public List<PlayerScoresDto> getPlayerScores(HttpResponse<String> response) throws IOException {
         JsonNode json = objectMapper.readTree(response.body()).findPath("data");
 
         List<PlayerAndScore> playerAndScoreList = objectMapper.readValue(json.toString(), new TypeReference<>() {
         });
         System.out.println(playerAndScoreList);
-        if(playerAndScoreList.isEmpty()) {
+        if (playerAndScoreList.isEmpty()) {
             return null;
         }
-
-        return playerAndScoreList.stream().filter(e -> e.getPts() != null).filter(e -> e.getPts() > 0).map(ele -> {
-            PlayerScoresDto playerScoresDto = new PlayerScoresDto();
-            playerScoresDto.setFirstName(ele.getFirstName());
-            playerScoresDto.setLastName(ele.getLastName());
-            playerScoresDto.setScore(ele.getPts());
-            return playerScoresDto;
-        }).collect(Collectors.toList());
-
+        return playerAndScoreList.stream()
+                .filter(e -> e.getPts() != null)
+                .filter(e -> e.getPts() > 0)
+                .map(ele -> {
+                    PlayerScoresDto playerScoresDto = new PlayerScoresDto();
+                    playerScoresDto.setFirstName(ele.getFirstName());
+                    playerScoresDto.setLastName(ele.getLastName());
+                    playerScoresDto.setScore(ele.getPts());
+                    return playerScoresDto;
+                }).collect(Collectors.toList());
     }
 
+    /**
+     * Nested class used to hold data before converting to the
+     * respective Dto
+     */
     @JsonIgnoreProperties(ignoreUnknown = true)
     private static class GameStats {
 
@@ -116,6 +139,7 @@ public class NbaApiParser {
         public void setHomeTeamName(Map<String, String> homeTeam) {
             setHomeTeamName(homeTeam.get("full_name"));
         }
+
         @JsonProperty("visitor_team")
         public void setVisitorTeamName(Map<String, String> visitorTeam) {
             setVisitorTeamName(visitorTeam.get("full_name"));
@@ -182,6 +206,10 @@ public class NbaApiParser {
         }
     }
 
+    /**
+     * Nested class used to hold data before converting to the
+     * respective Dto
+     */
     @JsonIgnoreProperties(ignoreUnknown = true)
     private static class PlayerAndScore {
 
