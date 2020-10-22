@@ -1,8 +1,12 @@
 package com.hro.exercise.nbachallenge.command;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.util.Map;
 
 /**
  * PlayerScores Dto
@@ -10,15 +14,24 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class PlayerScoresDto {
+
+
     @JsonIgnore
     private Integer id;
     @JsonProperty("First Name")
     private String firstName;
     @JsonProperty("Last Name")
     private String lastName;
-    @JsonProperty("Points")
     private Integer score;
+
+    @JsonProperty("player")
+    private void nestedObject(Map<String, Object> objectMap) {
+        setFirstName((String) objectMap.get("first_name"));
+        setLastName((String) objectMap.get("last_name"));
+    }
+
 
     public String getFirstName() {
         return firstName;
@@ -43,11 +56,11 @@ public class PlayerScoresDto {
     public void setId(Integer id) {
         this.id = id;
     }
-
+    @JsonProperty("Points")
     public Integer getScore() {
         return score;
     }
-
+    @JsonProperty("pts")
     public void setScore(Integer score) {
         this.score = score;
     }
