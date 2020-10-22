@@ -8,12 +8,12 @@ import org.springframework.stereotype.Component;
  * A {@link Converter} implementation, responsible for {@link Comment} to {@link CommentDto} type conversion
  */
 @Component
-public class CommentToCommentDto extends AbstractConverter<Comment, CommentDto>{
+public class CommentToCommentDto extends AbstractConverter<Comment, CommentDto> {
 
     @Override
     public CommentDto convert(Comment comment) {
-
         CommentDto commentDto = new CommentDto();
+
         commentDto.setId(comment.getId());
         commentDto.setComment(comment.getComment());
         commentDto.setDate(comment.getUpdateTime());

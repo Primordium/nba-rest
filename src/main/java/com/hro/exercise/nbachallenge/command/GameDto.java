@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.hro.exercise.nbachallenge.util.AppConstants;
 import com.sun.istack.NotNull;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -30,14 +31,17 @@ public class GameDto {
     private String visitorTeamName;
     private Integer homeTeamScore;
     private Integer visitorTeamScore;
+
     @JsonProperty("Players that Scored")
     private List<PlayerScoresDto> playerScores;
+
     @JsonProperty("Comments")
     private List<CommentDto> comments = new ArrayList<>();
 
     public Integer getId() {
         return id;
     }
+
     public void setId(Integer id) {
         this.id = id;
     }
@@ -46,6 +50,7 @@ public class GameDto {
     public Integer getGameId() {
         return gameId;
     }
+
     @JsonProperty("id")
     public void setGameId(Integer gameId) {
         this.gameId = gameId;
@@ -55,6 +60,7 @@ public class GameDto {
     public String getHomeTeamName() {
         return homeTeamName;
     }
+
     public void setHomeTeamName(String homeTeamName) {
         this.homeTeamName = homeTeamName;
     }
@@ -63,6 +69,7 @@ public class GameDto {
     public String getVisitorTeamName() {
         return visitorTeamName;
     }
+
     public void setVisitorTeamName(String visitorTeamName) {
         this.visitorTeamName = visitorTeamName;
     }
@@ -90,26 +97,29 @@ public class GameDto {
     public List<PlayerScoresDto> getPlayerScores() {
         return playerScores;
     }
+
     public void setPlayerScores(List<PlayerScoresDto> playerScores) {
         this.playerScores = playerScores;
     }
+
     public List<CommentDto> getComments() {
         return comments;
     }
+
     public void setComments(List<CommentDto> comments) {
         this.comments = comments;
     }
 
     @NotNull
     @JsonProperty("Date")
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "GMT")
+    @DateTimeFormat(pattern = AppConstants.DAY_TIME_FORMAT)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = AppConstants.DAY_TIME_FORMAT, timezone = "GMT")
     @Temporal(TemporalType.DATE)
     public Date getGameDate() {
         return gameDate;
     }
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @DateTimeFormat(pattern = AppConstants.DAY_TIME_FORMAT)
     @Temporal(TemporalType.DATE)
     @JsonProperty("date")
     public void setGameDate(Date gameDate) {
@@ -141,9 +151,9 @@ public class GameDto {
                 ", comments=" + comments +
                 '}';
     }
+
     @Override
     public boolean equals(Object o) {
-        if (o == this) {return true;}
-        return o instanceof GameDto && ((GameDto) o).gameId == this.gameId;
+        return (o == this) || (o instanceof GameDto && ((GameDto) o).gameId == gameId);
     }
 }

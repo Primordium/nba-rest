@@ -10,7 +10,8 @@ import org.springframework.stereotype.Component;
  * A {@link Converter} implementation, responsible for {@link Game} to {@link GameDto} type conversion
  */
 @Component
-public class GameToGameDto extends AbstractConverter<Game, GameDto>{
+public class GameToGameDto extends AbstractConverter<Game, GameDto> {
+
     private CommentToCommentDto commentToCommentDto;
     private PlayerScoresToPlayerScoresDto playerScoresToPlayerScoresDto;
 
@@ -20,14 +21,14 @@ public class GameToGameDto extends AbstractConverter<Game, GameDto>{
     }
 
     @Autowired
-    public void setPlayerDtoToPlayer(PlayerScoresToPlayerScoresDto playerDtoToPlayer) {
-        this.playerScoresToPlayerScoresDto = playerDtoToPlayer;
+    public void setPlayerDtoToPlayer(PlayerScoresToPlayerScoresDto playerScoresToPlayerScoresDto) {
+        this.playerScoresToPlayerScoresDto = playerScoresToPlayerScoresDto;
     }
 
     @Override
     public GameDto convert(Game game) {
-
         GameDto gameDto = new GameDto();
+
         gameDto.setId(game.getId());
         gameDto.setGameId(game.getGameId());
         gameDto.setHomeTeamName(game.getHomeTeamName());

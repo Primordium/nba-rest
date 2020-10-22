@@ -75,6 +75,7 @@ class RapidApiConnectionTest {
 
         GameDto gameDto = rapidApiConnection.getGameById(1);
 
+        // TODO: 10/22/2020 assert.equals
         assertTrue(gameDto.getGameId().equals(gameId));
         assertTrue(gameDto.getGameDate().equals(date));
         assertTrue(gameDto.getHomeTeamName().equals(homeTeamName));

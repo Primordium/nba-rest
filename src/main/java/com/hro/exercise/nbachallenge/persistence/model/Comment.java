@@ -1,6 +1,7 @@
 package com.hro.exercise.nbachallenge.persistence.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.hro.exercise.nbachallenge.util.AppConstants;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
@@ -11,7 +12,7 @@ import java.util.Date;
  */
 @Entity
 @Table(name = "comments")
-public class Comment extends AbstractModel implements Comparable<Comment>{
+public class Comment extends AbstractModel implements Comparable<Comment> {
 
     private String comment;
 
@@ -20,7 +21,7 @@ public class Comment extends AbstractModel implements Comparable<Comment>{
     private Game game;
 
     @Temporal(TemporalType.DATE)
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @DateTimeFormat(pattern = AppConstants.DAY_TIME_FORMAT)
     private Date date;
 
     public Comment() {
@@ -35,8 +36,9 @@ public class Comment extends AbstractModel implements Comparable<Comment>{
      * @param comment
      */
     public void editComment(String comment) {
-        game.updateComment(this.getId(), comment);
+        game.updateComment(getId(), comment);
     }
+
     /**
      * Gets the comment
      * @return String with the comment
@@ -82,6 +84,11 @@ public class Comment extends AbstractModel implements Comparable<Comment>{
         this.date = date;
     }
 
+    public void initProperties(Game game) {
+        this.game = game;
+        date = getUpdateTime();
+    }
+
     @Override
     public String toString() {
         return "Comment{" +
@@ -91,8 +98,6 @@ public class Comment extends AbstractModel implements Comparable<Comment>{
 
     @Override
     public int compareTo(Comment o) {
-        if (this.getDate() == null || o.getDate() == null)
-            return 0;
-        return getDate().compareTo(o.getDate());
+        return (this.getDate() == null || o.getDate() == null) ? 0 : getDate().compareTo(o.getDate());
     }
 }

@@ -35,9 +35,7 @@ class CommentToCommentDtoTest {
 
         CommentDto commentDto = commentToCommentDto.convert(comment);
 
-        assertTrue(commentDto.getId().equals(id));
-        assertTrue(commentDto.getComment().equals(sentence));
-
-
+        assertEquals(commentDto.getId(), id);
+        assertEquals(commentDto.getComment(), sentence);
     }
 }

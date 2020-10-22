@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hro.exercise.nbachallenge.command.GameDto;
 import com.hro.exercise.nbachallenge.command.PlayerScoresDto;
 import org.springframework.stereotype.Component;
+
 import java.io.IOException;
 import java.net.http.HttpResponse;
 import java.text.ParseException;
@@ -20,37 +21,40 @@ import java.util.stream.Collectors;
 @Component
 public class NbaApiParser {
 
-    private final ObjectMapper objectMapper;
+    private final ObjectMapper OBJECT_MAPPER;
 
     public NbaApiParser(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
+        OBJECT_MAPPER = objectMapper;
     }
 
     public Integer getGameId(HttpResponse<String> response) throws JsonProcessingException {
-        JsonNode rootNode = objectMapper.readTree(response.body());
+        JsonNode rootNode = OBJECT_MAPPER.readTree(response.body());
+
         return rootNode.path("id").asInt();
     }
 
     public Date getGameDate(HttpResponse<String> response) throws JsonProcessingException, ParseException {
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        SimpleDateFormat format = new SimpleDateFormat(AppConstants.DAY_AND_HOUR_TIME_FORMAT);
+
         format.setTimeZone(TimeZone.getTimeZone("UTC"));
-        return format.parse(objectMapper.readTree(response.body()).path("date").asText());
+
+        return format.parse(OBJECT_MAPPER.readTree(response.body()).path("date").asText());
     }
 
     public String getHomeTeamName(HttpResponse<String> response) throws JsonProcessingException {
-        return objectMapper.readTree(response.body()).path("home_team").path("full_name").asText();
+        return OBJECT_MAPPER.readTree(response.body()).path("home_team").path("full_name").asText();
     }
 
     public String getVisitorTeamName(HttpResponse<String> response) throws JsonProcessingException {
-        return objectMapper.readTree(response.body()).path("visitor_team").path("full_name").asText();
+        return OBJECT_MAPPER.readTree(response.body()).path("visitor_team").path("full_name").asText();
     }
 
     public Integer getHomeTeamScore(HttpResponse<String> response) throws JsonProcessingException {
-        return objectMapper.readTree(response.body()).path("home_team_score").asInt();
+        return OBJECT_MAPPER.readTree(response.body()).path("home_team_score").asInt();
     }
 
     public Integer getVisitorTeamScore(HttpResponse<String> response) throws JsonProcessingException {
-        return objectMapper.readTree(response.body()).path("visitor_team_score").asInt();
+        return OBJECT_MAPPER.readTree(response.body()).path("visitor_team_score").asInt();
     }
 
     /**
@@ -61,19 +65,16 @@ public class NbaApiParser {
      * @throws JsonProcessingException
      */
     public List<GameDto> getAllStatsByDate(HttpResponse<String> response) throws JsonProcessingException {
-        JsonNode jsonNode = objectMapper.readTree(response.body()).findPath("data");
-        List<GameDto> gameStatsList = objectMapper.readValue(jsonNode.toString(), new TypeReference<>() {
+
+        JsonNode jsonNode = OBJECT_MAPPER.readTree(response.body()).findPath("data");
+        List<GameDto> gameStatsList = OBJECT_MAPPER.readValue(jsonNode.toString(), new TypeReference<>() {
         });
 
-        if(gameStatsList.isEmpty()) {
-            return null;
-        }
-
-        return gameStatsList;
+        return gameStatsList.isEmpty() ? null : gameStatsList;
     }
 
     /**
-     * Method to retrieve the players and their scores, since RapicApi doesn't provide both values
+     * Method to retrieve the players and their scores, since RapidApi doesn't provide both values
      * in the same object
      *
      * @param response HttpRequest provided by NbaRapidConnection
@@ -81,17 +82,15 @@ public class NbaApiParser {
      * @throws IOException
      */
     public List<PlayerScoresDto> getPlayerScores(HttpResponse<String> response) throws IOException {
-        JsonNode json = objectMapper.readTree(response.body()).findPath("data");
 
-        List<PlayerScoresDto> playerAndScoreList = objectMapper.readValue(json.toString(), new TypeReference<>() {
+        JsonNode json = OBJECT_MAPPER.readTree(response.body()).findPath("data");
+        List<PlayerScoresDto> playerAndScoreList = OBJECT_MAPPER.readValue(json.toString(), new TypeReference<>() {
         });
-        if (playerAndScoreList.isEmpty()) {
-            return null;
-        }
-        return playerAndScoreList.stream()
-                .filter(e -> e.getScore() != null)
-                .filter(e -> e.getScore() > 0)
-                .collect(Collectors.toList());
-    }
 
+        return playerAndScoreList.isEmpty() ? null :
+                playerAndScoreList.stream()
+                        .filter(e -> e.getScore() != null)
+                        .filter(e -> e.getScore() > 0)
+                        .collect(Collectors.toList());
+    }
 }

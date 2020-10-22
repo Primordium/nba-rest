@@ -14,20 +14,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
-import java.util.List;
-
 @RestController
 @RequestMapping("/api/nbadb")
 public class RestCommentController {
 
     private GameRepository gameRepository;
     private CommentRepository commentRepository;
-    private RestGameController restGameController;
     private RapidApiConnection rapidApiConnection;
     private GameDtoToGame gameDtoToGame;
 
-    private static final Logger log = LoggerFactory.getLogger(RestCommentController.class);
+    private static final Logger LOG = LoggerFactory.getLogger(RestCommentController.class);
 
     /**
      * Sets the game repository
@@ -70,17 +66,6 @@ public class RestCommentController {
     }
 
     /**
-     * Sets rest game controller
-     *
-     * @param restGameController
-     */
-
-    @Autowired
-    public void setRestGameController(RestGameController restGameController) {
-        this.restGameController = restGameController;
-    }
-
-    /**
      * Adds a comment to the commentList of the game with the gameId
      *
      * @param gameId  of the game;
@@ -90,33 +75,37 @@ public class RestCommentController {
     @PostMapping("comments/{gameId}")
     public ResponseEntity<?> postCommentsForGameId(@PathVariable Integer gameId, @RequestBody String comment) {
 
-        // Could search for the game and add it before posting a comment
-        // Need to explore that possibility
+        ResponseEntity<?> responseEntity = null;
+        Comment cmnt = new Comment(comment);
+        Game game;
+        GameDto gameDto;
 
         if (comment.isEmpty()) {
-            return new ResponseEntity<>("Could not use your comment. \nReason: Comment is empty", HttpStatus.BAD_REQUEST);
+            LOG.warn("COMMENT : Comment discarded, reason : Empty comment");
+            responseEntity = new ResponseEntity<>("Could not use your comment. \nReason: Comment is empty", HttpStatus.BAD_REQUEST);
         }
 
-        Game game = gameRepository.findByGameId(gameId);
+        game = gameRepository.findByGameId(gameId);
 
-        if (game == null) {
-            GameDto gameDto = rapidApiConnection.getGameById(gameId);
+        if (game == null && responseEntity == null) {
+            gameDto = rapidApiConnection.getGameById(gameId);
             if (gameDto == null) {
-                log.warn("WARNING : Comment(" + comment + ") could not be added to please check game ID");
-                return new ResponseEntity<>("Could not find game in Database", HttpStatus.NOT_FOUND);
+                LOG.warn("COMMENT : Game with id '" + gameId + "' not found, could NOT add comment '" + comment + "'");
+                responseEntity = new ResponseEntity<>("Could not find game in Database", HttpStatus.NOT_FOUND);
             }
+
             gameRepository.save(gameDtoToGame.convert(gameDto));
         }
-        game = gameRepository.findByGameId(gameId);
-        Comment cmnt = new Comment(comment);
-        cmnt.setGame(game);
-        cmnt.setDate(cmnt.getUpdateTime());
-        game.getCommentList().add(cmnt);
-        Collections.sort(game.getCommentList());
-        commentRepository.save(cmnt);
-        gameRepository.save(game);
-        log.info("COMMENT :'" + comment + "' added to Game with ID: '" + game.getGameId() + "'");
-        return new ResponseEntity<>("Your comment: '" + comment + "' had been added to the game with ID: " + gameId, HttpStatus.CREATED);
+        if(responseEntity == null) {
+            game = gameRepository.findByGameId(gameId);
+            cmnt.initProperties(game);
+            game.getCommentList().add(cmnt);
+            commentRepository.save(cmnt);
+            gameRepository.save(game);
+            LOG.info("COMMENT : Added to game with id: '" + gameId + "' comment '" + comment + "'");
+            responseEntity = new ResponseEntity<>("Your comment: '" + comment + "' had been added to the game with ID: " + gameId, HttpStatus.CREATED);
+        }
+        return responseEntity;
     }
 
     /**
@@ -127,25 +116,36 @@ public class RestCommentController {
      * @param commentNew the new comment to replace the new one
      * @return Response Entity
      */
-
     @PutMapping("comments/{commentId}")
     public ResponseEntity<?> updateCommentById(@PathVariable Integer commentId, @RequestBody String commentNew) {
+
+        Comment comment;
+        ResponseEntity<?> responseEntity = null;
+
         if (commentNew.isEmpty()) {
-            return new ResponseEntity<>("Could not replace the comment : " + commentId + "\nReason: New comment is empty", HttpStatus.BAD_REQUEST);
+            LOG.warn("COMMENT : Comment discarded, reason : Empty comment");
+            responseEntity = new ResponseEntity<>("Could not use your comment. \nReason: Comment is empty",
+                    HttpStatus.BAD_REQUEST);
         }
 
-        if (commentRepository.findById(commentId).isEmpty()) {
-            log.warn("WARNING : The Comment with the ID: " + commentId + " could not be edited, invalid comment id");
-            return new ResponseEntity("Could not find a comment with the provided commentID", HttpStatus.NOT_FOUND);
+        if (commentRepository.findById(commentId).isEmpty() && responseEntity == null) {
+            LOG.warn("COMMENT : Could not find the comment with the ID: '" + commentId + "'");
+            responseEntity = new ResponseEntity<>("Could not find a comment with the provided commentID",
+                    HttpStatus.NOT_FOUND);
         }
 
-        Comment comment = commentRepository.getOne(commentId);
-        comment.editComment(commentNew);
-        log.info("COMMENT :" + commentNew + " replaced to the comment with ID: '" + commentId + "'");
-        gameRepository.save(comment.getGame());
+        if (responseEntity == null) {
+            comment = commentRepository.getOne(commentId);
+            comment.editComment(commentNew);
+            LOG.info("COMMENT : The comment with id: '" + commentId + "' has been replaced for '" + commentNew + "'");
+            gameRepository.save(comment.getGame());
+            responseEntity = new ResponseEntity<>("Comment with id :'" + commentId + "' " +
+                    "has been replaced with : '" + commentNew + "'", HttpStatus.OK);
+        }
 
-        return new ResponseEntity<>("Your comment :'" + commentNew + "' replaced to the comment with ID: " + commentId, HttpStatus.OK);
+        return responseEntity;
     }
+
 
     /**
      * Deletes a comment with the provided Id
@@ -155,15 +155,20 @@ public class RestCommentController {
      */
     @DeleteMapping("comments/{commentId}")
     public ResponseEntity<?> deleteCommentById(@PathVariable Integer commentId) {
+        ResponseEntity<?> responseEntity = null;
 
         if (commentRepository.findById(commentId).isEmpty()) {
-            log.info("COMMENT : The comment with '" + commentId + "' was not present and could not be removed");
-            return new ResponseEntity("Could not find a comment with the provided commentID", HttpStatus.NOT_FOUND);
+            LOG.info("COMMENT : The comment with '" + commentId + "' could not be removed\nReason : Not present");
+            responseEntity = new ResponseEntity<>("Could not find a comment with the provided commentID", HttpStatus.NOT_FOUND);
         }
 
-        commentRepository.getOne(commentId).getGame().removeComment(commentId);
-        gameRepository.save(commentRepository.getOne(commentId).getGame());
-        return new ResponseEntity<>("Comment with id " + commentId + " has been deleted", HttpStatus.OK);
+        if (responseEntity == null) {
+            commentRepository.getOne(commentId).getGame().removeComment(commentId);
+            gameRepository.save(commentRepository.getOne(commentId).getGame());
+            LOG.info("COMMENT : Removed the comment with comment id : '" + commentId + "'");
+            responseEntity = new ResponseEntity<>("Comment with id " + commentId + " has been deleted", HttpStatus.OK);
+        }
 
+        return responseEntity;
     }
 }

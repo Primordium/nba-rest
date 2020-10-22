@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
  */
 
 @Component
-public class PlayerScoresDtoToPlayerScores extends AbstractConverter<PlayerScoresDto, PlayerScores>{
+public class PlayerScoresDtoToPlayerScores extends AbstractConverter<PlayerScoresDto, PlayerScores> {
 
     private PlayerScoresRepository playerScoresRepository;
 
@@ -24,8 +24,9 @@ public class PlayerScoresDtoToPlayerScores extends AbstractConverter<PlayerScore
 
     @Override
     public PlayerScores convert(PlayerScoresDto playerScoresDto) {
+        PlayerScores playerScores = (playerScoresDto.getId() != null ?
+                playerScoresRepository.getOne(playerScoresDto.getId()) : new PlayerScores());
 
-        PlayerScores playerScores = (playerScoresDto.getId() != null ? playerScoresRepository.getOne(playerScoresDto.getId()) : new PlayerScores());
         playerScores.setLastName(playerScoresDto.getLastName());
         playerScores.setFirstName(playerScoresDto.getFirstName());
         playerScores.setScore(playerScoresDto.getScore());

@@ -9,12 +9,14 @@ import javax.persistence.*;
  */
 @Entity
 @Table
-public class PlayerScores extends AbstractModel{
+public class PlayerScores extends AbstractModel {
 
     @JsonProperty
     private String firstName;
+
     @JsonProperty
     private String lastName;
+
     @JsonProperty
     private Integer score;
 

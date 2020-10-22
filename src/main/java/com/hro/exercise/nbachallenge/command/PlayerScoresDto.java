@@ -17,13 +17,15 @@ import java.util.Map;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PlayerScoresDto {
 
-
     @JsonIgnore
     private Integer id;
+
     @JsonProperty("First Name")
     private String firstName;
+
     @JsonProperty("Last Name")
     private String lastName;
+
     private Integer score;
 
     @JsonProperty("player")
@@ -56,10 +58,12 @@ public class PlayerScoresDto {
     public void setId(Integer id) {
         this.id = id;
     }
+
     @JsonProperty("Points")
     public Integer getScore() {
         return score;
     }
+
     @JsonProperty("pts")
     public void setScore(Integer score) {
         this.score = score;
@@ -77,7 +81,6 @@ public class PlayerScoresDto {
 
     @Override
     public boolean equals(Object o) {
-        if (o == this) {return true;}
-        return o instanceof PlayerScoresDto && (((PlayerScoresDto) o).id) == this.id;
+        return (o == this) || (o instanceof PlayerScoresDto && (((PlayerScoresDto) o).id) == id);
     }
 }

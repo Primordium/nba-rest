@@ -20,10 +20,12 @@ public abstract class AbstractModel implements Model {
     @Version
     @JsonIgnore
     private Integer version;
+
     @CreationTimestamp
     @Column(updatable = false)
     @JsonIgnore
     private Date creationTime;
+
     @UpdateTimestamp
     @JsonIgnore
     private Date updateTime;

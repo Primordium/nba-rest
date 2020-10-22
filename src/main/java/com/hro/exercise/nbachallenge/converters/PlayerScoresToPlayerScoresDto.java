@@ -11,11 +11,12 @@ import org.springframework.stereotype.Component;
  * A {@link Converter} implementation, responsible for {@link PlayerScores} to {@link PlayerScoresDto} type conversion
  */
 @Component
-public class PlayerScoresToPlayerScoresDto extends AbstractConverter<PlayerScores, PlayerScoresDto>{
+public class PlayerScoresToPlayerScoresDto extends AbstractConverter<PlayerScores, PlayerScoresDto> {
 
     @Override
     public PlayerScoresDto convert(PlayerScores playerScores) {
         PlayerScoresDto playerScoresDto = new PlayerScoresDto();
+
         playerScoresDto.setFirstName(playerScores.getFirstName());
         playerScoresDto.setLastName(playerScores.getLastName());
         playerScoresDto.setId(playerScores.getId());
