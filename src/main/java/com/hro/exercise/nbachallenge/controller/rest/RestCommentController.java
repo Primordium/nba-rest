@@ -2,7 +2,8 @@ package com.hro.exercise.nbachallenge.controller.rest;
 
 import com.hro.exercise.nbachallenge.command.GameDto;
 import com.hro.exercise.nbachallenge.converters.GameDtoToGame;
-import com.hro.exercise.nbachallenge.exception.rest.BadRequest;
+import com.hro.exercise.nbachallenge.exception.ErrorMessage;
+import com.hro.exercise.nbachallenge.exception.rest.BadApiRequest;
 import com.hro.exercise.nbachallenge.exception.rest.ResourceNotFound;
 import com.hro.exercise.nbachallenge.persistence.dao.CommentRepository;
 import com.hro.exercise.nbachallenge.persistence.dao.GameRepository;
@@ -77,7 +78,7 @@ public class RestCommentController {
      */
     @PostMapping("comments/{gameId}")
     public ResponseEntity<?> postCommentsForGameId(@PathVariable Integer gameId,
-                                                   @RequestBody String comment) throws ResourceNotFound, BadRequest {
+                                                   @RequestBody String comment) throws ResourceNotFound, BadApiRequest {
 
         Comment cmnt = new Comment(comment);
         Game game;
@@ -85,7 +86,7 @@ public class RestCommentController {
 
         if (comment.isEmpty()) {
             LOG.warn("COMMENT : Comment discarded, reason : Empty comment");
-            throw new BadRequest("Could not use your comment. \nReason: Comment is empty");
+            throw new BadApiRequest("Could not use your comment. \nReason: Comment is empty");
         }
 
         game = gameRepository.findByGameId(gameId);
@@ -120,18 +121,18 @@ public class RestCommentController {
      */
     @PutMapping("comments/{commentId}")
     public ResponseEntity<?> updateCommentById(@PathVariable Integer commentId,
-                                               @RequestBody String commentNew) throws BadRequest, ResourceNotFound {
+                                               @RequestBody String commentNew) throws BadApiRequest, ResourceNotFound {
 
         Comment comment;
 
         if (commentNew.isEmpty()) {
-            LOG.warn("COMMENT : Comment discarded, reason : Empty comment");
-            throw new BadRequest("Could not use your comment. \nReason: Comment is empty");
+            LOG.warn(ErrorMessage.COMMENT_EMPTY);
+            throw new BadApiRequest(ErrorMessage.COMMENT_EMPTY);
         }
 
         if (commentRepository.findById(commentId).isEmpty()) {
-            LOG.warn("COMMENT : Could not find the comment with the ID: '" + commentId + "'");
-            throw new ResourceNotFound("Could not find a comment with the provided commentID");
+            LOG.warn(ErrorMessage.COMMENT_NOT_FOUND_WITH_ID + commentId);
+            throw new ResourceNotFound(ErrorMessage.COMMENT_NOT_FOUND_WITH_ID + commentId);
         }
 
         comment = commentRepository.getOne(commentId);
@@ -153,13 +154,13 @@ public class RestCommentController {
     public ResponseEntity<?> deleteCommentById(@PathVariable Integer commentId) throws ResourceNotFound {
 
         if (commentRepository.findById(commentId).isEmpty()) {
-            LOG.info("COMMENT : The comment with '" + commentId + "' could not be removed. Reason : Not present");
-            throw new ResourceNotFound("Could not find a comment with the provided commentID");
+            LOG.info("The comment with '" + commentId + "' could not be removed. Reason : Not present");
+            throw new ResourceNotFound(ErrorMessage.COMMENT_NOT_FOUND_WITH_ID + commentId);
         }
 
         commentRepository.getOne(commentId).getGame().removeComment(commentId);
         gameRepository.save(commentRepository.getOne(commentId).getGame());
-        LOG.info("COMMENT : Removed the comment with comment id : '" + commentId + "'");
+        LOG.info("Removed the comment with comment id : '" + commentId + "'");
 
         return ResponseEntity.ok("Comment with id " + commentId + " has been deleted");
     }

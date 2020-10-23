@@ -4,14 +4,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.time.LocalDateTime;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(BadRequest.class)
-    public ResponseEntity<ExceptionResponse> customException(BadRequest ex) {
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(BadApiRequest.class)
+    public ResponseEntity<ExceptionResponse> customException(BadApiRequest ex) {
         ExceptionResponse response=new ExceptionResponse();
         response.setErrorCode("BAD_REQUEST");
         response.setErrorMessage(ex.getMessage());
@@ -20,6 +22,7 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<ExceptionResponse>(response, HttpStatus.BAD_REQUEST);
     }
 
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(CustomException.class)
     public ResponseEntity<ExceptionResponse> customException(CustomException ex) {
         ExceptionResponse response=new ExceptionResponse();
@@ -30,6 +33,7 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<ExceptionResponse>(response, HttpStatus.BAD_REQUEST);
     }
 
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(ResourceNotFound.class)
     public ResponseEntity<ExceptionResponse> resourceNotFound(ResourceNotFound ex) {
         ExceptionResponse response = new ExceptionResponse();

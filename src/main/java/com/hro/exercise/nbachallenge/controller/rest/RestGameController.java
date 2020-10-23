@@ -3,6 +3,9 @@ package com.hro.exercise.nbachallenge.controller.rest;
 import com.hro.exercise.nbachallenge.command.GameDto;
 import com.hro.exercise.nbachallenge.converters.GameDtoToGame;
 import com.hro.exercise.nbachallenge.converters.GameToGameDto;
+import com.hro.exercise.nbachallenge.exception.ErrorMessage;
+import com.hro.exercise.nbachallenge.exception.rest.BadApiRequest;
+import com.hro.exercise.nbachallenge.exception.rest.CustomException;
 import com.hro.exercise.nbachallenge.exception.rest.ResourceNotFound;
 import com.hro.exercise.nbachallenge.persistence.dao.GameRepository;
 import com.hro.exercise.nbachallenge.persistence.model.Game;
@@ -19,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -97,7 +101,7 @@ public class RestGameController {
     @GetMapping("/date")
     public ResponseEntity<?> getGamesByDate(
             @RequestParam(value = "date", required = true)
-            @Validated @DateTimeFormat(pattern = AppConstants.DAY_TIME_FORMAT) Date date) throws ResourceNotFound {
+            @Validated @DateTimeFormat(pattern = AppConstants.DAY_TIME_FORMAT) Date date) throws ResourceNotFound, CustomException {
         return getGamesByDateWithPath(date);
     }
 
@@ -119,25 +123,29 @@ public class RestGameController {
      */
     @GetMapping("date/{date}")
     public ResponseEntity<?> getGamesByDateWithPath(@PathVariable @Validated @DateTimeFormat
-            (pattern = AppConstants.DAY_TIME_FORMAT) Date date) throws ResourceNotFound {
+            (pattern = AppConstants.DAY_TIME_FORMAT) Date date) throws ResourceNotFound, CustomException {
+
+        if(date.after(Date.from(Instant.now()))){
+            throw new CustomException("Please provide a Date in the past");
+        }
 
         List<Game> dbList;
         List<GameDto> apiList;
         DateFormat dateFormat = new SimpleDateFormat(AppConstants.DAY_TIME_FORMAT);
 
-        LOG.info("GAME : Searching Database games with date '" + date + "'");
+        LOG.info("Searching Database games with date '" + date + "'");
         dbList = gameRepository.findByGameDate(date);
         apiList = rapidApiConnection.getGamesByDate(dateFormat.format(date));
 
         if (apiList.size() > dbList.size()) {
-            LOG.info("GAME : Merging, Rapid Api provided more games to the given date");
+            LOG.info("Merging, Rapid Api provided more games to the given date");
             gameRepository.saveAll(gameDtoToGame.convert(apiList));
             gameRepository.flush();
         }
 
         if (apiList.isEmpty() && dbList.isEmpty()) {
-            LOG.info("GAME: There where no games to the given date: " + date);
-            throw new ResourceNotFound("There where no games for the give date");
+            LOG.info(ErrorMessage.GAME_NOT_FOUND_WITH_DATE + date);
+            throw new ResourceNotFound(ErrorMessage.GAME_NOT_FOUND_WITH_DATE);
         }
 
         return ResponseEntity.ok(gameToGameDto.convert(gameRepository.findByGameDate(date)));
@@ -155,19 +163,19 @@ public class RestGameController {
         GameDto gameDto;
 
         if (gameRepository.findByGameId(gameId) != null) {
-            LOG.info("GAME : Found in DB the game with ID: '" + gameId + "'");
+            LOG.info("Game found in DB the game with ID: '" + gameId + "'");
             gameDto = gameToGameDto.convert(gameRepository.findByGameId(gameId));
             Collections.reverse(gameDto.getComments());
 
             return ResponseEntity.ok(gameDto);
         }
 
-        LOG.info("GAME : Didn't find in DB game with ID : '" + gameId + "'");
+        LOG.info(ErrorMessage.GAME_NOT_FOUND_WITH_ID + gameId);
         gameDto = rapidApiConnection.getGameById(gameId);
 
         if (gameDto == null) {
-            LOG.info("GAME : Couldn't find any game with provided ID : '" + gameId + "'");
-            throw new ResourceNotFound("Couldn't find any game with provided ID");
+            LOG.info(ErrorMessage.GAME_NOT_FOUND_WITH_ID + gameId);
+            throw new ResourceNotFound(ErrorMessage.COMMENT_NOT_FOUND_WITH_ID + gameId);
         }
 
         gameRepository.save(gameDtoToGame.convert(gameDto));
