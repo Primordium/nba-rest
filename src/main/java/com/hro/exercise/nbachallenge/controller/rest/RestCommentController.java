@@ -2,7 +2,7 @@ package com.hro.exercise.nbachallenge.controller.rest;
 
 import com.hro.exercise.nbachallenge.command.GameDto;
 import com.hro.exercise.nbachallenge.converters.GameDtoToGame;
-import com.hro.exercise.nbachallenge.exception.ErrorMessage;
+import com.hro.exercise.nbachallenge.util.Messages;
 import com.hro.exercise.nbachallenge.exception.rest.BadApiRequest;
 import com.hro.exercise.nbachallenge.exception.rest.ResourceNotFound;
 import com.hro.exercise.nbachallenge.persistence.dao.CommentRepository;
@@ -85,8 +85,8 @@ public class RestCommentController {
         GameDto gameDto;
 
         if (comment.isEmpty()) {
-            LOG.warn("COMMENT : Comment discarded, reason : Empty comment");
-            throw new BadApiRequest("Could not use your comment. \nReason: Comment is empty");
+            LOG.warn(Messages.COMMENT_EMPTY);
+            throw new BadApiRequest(Messages.COMMENT_EMPTY);
         }
 
         game = gameRepository.findByGameId(gameId);
@@ -94,8 +94,8 @@ public class RestCommentController {
         if (game == null) {
             gameDto = rapidApiConnection.getGameById(gameId);
             if (gameDto == null) {
-                LOG.warn("COMMENT : Game with id '" + gameId + "' not found, could NOT add comment '" + comment + "'");
-                throw new ResourceNotFound("Could not find game in Database");
+                LOG.warn(Messages.GAME_NOT_FOUND_WITH_ID + gameId + "could not add your comment");
+                throw new ResourceNotFound(Messages.GAME_NOT_FOUND_WITH_ID + gameId + "could not add your comment");
             }
             gameRepository.save(Objects.requireNonNull(gameDtoToGame.convert(gameDto)));
         }
@@ -126,13 +126,13 @@ public class RestCommentController {
         Comment comment;
 
         if (commentNew.isEmpty()) {
-            LOG.warn(ErrorMessage.COMMENT_EMPTY);
-            throw new BadApiRequest(ErrorMessage.COMMENT_EMPTY);
+            LOG.warn(Messages.COMMENT_EMPTY);
+            throw new BadApiRequest(Messages.COMMENT_EMPTY);
         }
 
         if (commentRepository.findById(commentId).isEmpty()) {
-            LOG.warn(ErrorMessage.COMMENT_NOT_FOUND_WITH_ID + commentId);
-            throw new ResourceNotFound(ErrorMessage.COMMENT_NOT_FOUND_WITH_ID + commentId);
+            LOG.warn(Messages.COMMENT_NOT_FOUND_WITH_ID + commentId);
+            throw new ResourceNotFound(Messages.COMMENT_NOT_FOUND_WITH_ID + commentId);
         }
 
         comment = commentRepository.getOne(commentId);
@@ -155,7 +155,7 @@ public class RestCommentController {
 
         if (commentRepository.findById(commentId).isEmpty()) {
             LOG.info("The comment with '" + commentId + "' could not be removed. Reason : Not present");
-            throw new ResourceNotFound(ErrorMessage.COMMENT_NOT_FOUND_WITH_ID + commentId);
+            throw new ResourceNotFound(Messages.COMMENT_NOT_FOUND_WITH_ID + commentId);
         }
 
         commentRepository.getOne(commentId).getGame().removeComment(commentId);

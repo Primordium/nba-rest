@@ -35,6 +35,7 @@ public class NbaApiParser {
         return rootNode.path("id").asInt();
     }
 
+
     public Date getGameDate(HttpResponse<String> response) throws JsonProcessingException, ParseException {
         SimpleDateFormat format = new SimpleDateFormat(AppConstants.DAY_AND_HOUR_TIME_FORMAT);
 

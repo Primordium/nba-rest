@@ -5,10 +5,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hro.exercise.nbachallenge.command.GameDto;
 import com.hro.exercise.nbachallenge.exception.ApiConnectionFail;
 import com.hro.exercise.nbachallenge.exception.BadRapidApiRequest;
-import com.hro.exercise.nbachallenge.exception.ErrorMessage;
 import com.hro.exercise.nbachallenge.exception.JsonProcessingFailure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
@@ -26,7 +26,7 @@ import java.util.List;
 public class RapidApiConnection {
 
     private final ObjectMapper OBJECT_MAPPER;
-    private final NbaApiParser NBA_API_PARSER;
+    private  NbaApiParser nbaApiParser;
     private static final Logger LOG = LoggerFactory.getLogger(RapidApiConnection.class);
 
     // Was in use, before docker, will try to implement again.
@@ -37,7 +37,12 @@ public class RapidApiConnection {
         // replace file with key for hardcoded key because docker
         //configFile = Paths.get("src\\main\\resources\\conf\\apiconf.json").toFile();
         OBJECT_MAPPER = new ObjectMapper();
-        NBA_API_PARSER = new NbaApiParser(OBJECT_MAPPER);
+
+    }
+
+    @Autowired
+    public void setNbaApiParser(NbaApiParser nbaApiParser) {
+        this.nbaApiParser = nbaApiParser;
     }
 
 
@@ -103,7 +108,7 @@ public class RapidApiConnection {
             int currentPage = OBJECT_MAPPER.readTree(response.body()).findPath("meta").findPath("current_page").asInt();
 
             while (currentPage++ <= total_pages) {
-                gameDtoList.addAll(NBA_API_PARSER.getAllStatsByDate(response));
+                gameDtoList.addAll(nbaApiParser.getAllStatsByDate(response));
                 currentUrl = url.replace("%(pageNumber)", Integer.toString(currentPage));
                 response = openNbaApiConnection(currentUrl);
             }
@@ -151,23 +156,23 @@ public class RapidApiConnection {
                 gameDto = null;
             }
         } catch (JsonProcessingException e) {
-            LOG.error(ErrorMessage.JSON_PARSE_PROBLEM);
+            LOG.error(Messages.JSON_PARSE_PROBLEM);
         }
 
         if (gameDto != null) {
             try {
-                gameDto.setPlayerScores(NBA_API_PARSER.getPlayerScores(response));
+                gameDto.setPlayerScores(nbaApiParser.getPlayerScores(response));
                 response = openNbaApiConnection("games/" + gameId);
-                gameDto.setGameId(NBA_API_PARSER.getGameId(response));
-                gameDto.setHomeTeamName(NBA_API_PARSER.getHomeTeamName(response));
-                gameDto.setVisitorTeamName(NBA_API_PARSER.getVisitorTeamName(response));
-                gameDto.setHomeTeamScore(NBA_API_PARSER.getHomeTeamScore(response));
-                gameDto.setVisitorTeamScore(NBA_API_PARSER.getVisitorTeamScore(response));
-                gameDto.setGameDate(NBA_API_PARSER.getGameDate(response));
+                gameDto.setGameId(nbaApiParser.getGameId(response));
+                gameDto.setHomeTeamName(nbaApiParser.getHomeTeamName(response));
+                gameDto.setVisitorTeamName(nbaApiParser.getVisitorTeamName(response));
+                gameDto.setHomeTeamScore(nbaApiParser.getHomeTeamScore(response));
+                gameDto.setVisitorTeamScore(nbaApiParser.getVisitorTeamScore(response));
+                gameDto.setGameDate(nbaApiParser.getGameDate(response));
                 LOG.info("RAPID API : Found game with game id : '" + gameId + "'");
 
             } catch (Exception e) {
-                LOG.error(ErrorMessage.JSON_PARSE_PROBLEM);
+                LOG.error(Messages.JSON_PARSE_PROBLEM);
             }
         }
         return gameDto;

@@ -5,6 +5,9 @@ import com.hro.exercise.nbachallenge.util.AppConstants;
 
 import java.time.LocalDateTime;
 
+/**
+ * Exception Response format
+ */
 public class ExceptionResponse {
 
     private String errorMessage;

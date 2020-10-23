@@ -1,11 +1,16 @@
 package com.hro.exercise.nbachallenge.util;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hro.exercise.nbachallenge.command.GameDto;
 import com.hro.exercise.nbachallenge.command.PlayerScoresDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.io.IOException;
 import java.net.http.HttpClient;
@@ -13,13 +18,20 @@ import java.net.http.HttpRequest;
 import java.nio.file.Path;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class RapidApiConnectionTest {
 
+    @Mock
+    private NbaApiParser nbaApiParser;
+    @InjectMocks
+    private RapidApiConnection rapidApiConnection;
     @MockBean
     private HttpRequest httpRequest = mock(HttpRequest.class);
     @MockBean
@@ -28,30 +40,43 @@ class RapidApiConnectionTest {
     private Path path = mock(Path.class);
     @MockBean
     private GameDto gameDto = mock(GameDto.class);
-
+    private MockMvc mock;
+    private ObjectMapper objectMapper;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
+        mock = MockMvcBuilders.standaloneSetup(rapidApiConnection).build();
+        objectMapper = new ObjectMapper();
     }
-
-
     @Test
     void getGameById() throws IOException, ParseException {
 
-        // Mock on nbaApiParser start to fail, was requesting real thing
-
-        NbaApiParser nbaApiParser = mock(NbaApiParser.class);
         List<PlayerScoresDto> playerScores = new ArrayList<>();
-        RapidApiConnection rapidApiConnection = new RapidApiConnection();
+        Date date = new Date();
+        Integer gameId = 1;
+        String homeTeamName = "Mini";
+        String visitorTeamName = "Mi";
+        Integer homeTeamScore = 100;
+        Integer visitorTeamScore = 200;
+
+        when(nbaApiParser.getGameId(any())).thenReturn(1);
+        when(nbaApiParser.getGameDate(any())).thenReturn(date);
+        when(nbaApiParser.getHomeTeamName(any())).thenReturn(homeTeamName);
+        when(nbaApiParser.getVisitorTeamName(any())).thenReturn(visitorTeamName);
+        when(nbaApiParser.getHomeTeamScore(any())).thenReturn(homeTeamScore);
+        when(nbaApiParser.getVisitorTeamScore(any())).thenReturn(visitorTeamScore);
+        when(nbaApiParser.getPlayerScores(any())).thenReturn(playerScores);
 
         GameDto gameDto = rapidApiConnection.getGameById(1);
 
-        assertEquals(gameDto.getGameId(), 1);
-        assertEquals(gameDto.getHomeTeamName(), "Boston Celtics");
-        assertEquals(gameDto.getVisitorTeamName(), "Philadelphia 76ers");
-        assertEquals(gameDto.getHomeTeamScore(), 105);
-        assertEquals(gameDto.getVisitorTeamScore(), 87);
+        assertTrue(gameDto.getGameId().equals(gameId));
+        assertTrue(gameDto.getGameDate().equals(date));
+        assertTrue(gameDto.getHomeTeamName().equals(homeTeamName));
+        assertTrue(gameDto.getVisitorTeamName().equals(visitorTeamName));
+        assertTrue(gameDto.getHomeTeamScore().equals(homeTeamScore));
+        assertTrue(gameDto.getVisitorTeamScore().equals(visitorTeamScore));
+        assertTrue(gameDto.getPlayerScores().equals(playerScores));
 
     }
 
