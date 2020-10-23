@@ -12,6 +12,7 @@ import java.util.List;
  */
 @Repository
 public interface GameRepository extends JpaRepository<Game, Integer> {
+
     /**
      * Finds and retrieves Game Object based on the property gameId;
      * @param gameId the value to search for

@@ -6,9 +6,9 @@ import com.hro.exercise.nbachallenge.persistence.dao.PlayerScoresRepository;
 import com.hro.exercise.nbachallenge.persistence.model.PlayerScores;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import static org.mockito.Mockito.*;
-import static org.junit.jupiter.api.Assertions.*;
-import java.util.Date;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
 
 class PlayerScoresToPlayerScoresDtoTest {
 
@@ -40,10 +40,10 @@ class PlayerScoresToPlayerScoresDtoTest {
 
         PlayerScoresDto playerScoresDto = playerScoresToPlayerScoresDto.convert(playerScores);
 
-        assertTrue(playerScoresDto.getFirstName().equals(firstName));
-        assertTrue(playerScoresDto.getLastName().equals(lastName));
-        assertTrue(playerScoresDto.getScore().equals(score));
-        assertTrue(playerScoresDto.getId().equals(id));
+        assertEquals(playerScoresDto.getFirstName(), firstName);
+        assertEquals(playerScoresDto.getLastName(), lastName);
+        assertEquals(playerScoresDto.getScore(), score);
+        assertEquals((int) playerScoresDto.getId(), id);
 
 
     }

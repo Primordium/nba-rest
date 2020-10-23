@@ -3,7 +3,7 @@ package com.hro.exercise.nbachallenge.command;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.hro.exercise.nbachallenge.persistence.model.Comment;
+import com.hro.exercise.nbachallenge.util.AppConstants;
 import com.sun.istack.NotNull;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -16,7 +16,7 @@ import java.util.Date;
  * Assures security/filter when providing comment data to the user
  */
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class CommentDto implements Comparable<CommentDto>{
+public class CommentDto implements Comparable<CommentDto> {
 
     @JsonProperty("Comment ID")
     private Integer id;
@@ -26,8 +26,8 @@ public class CommentDto implements Comparable<CommentDto>{
     private String comment;
 
     @NotNull
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT")
+    @DateTimeFormat(pattern = AppConstants.DAY_TIME_FORMAT)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = AppConstants.DAY_AND_HOUR_TIME_FORMAT, timezone = "GMT")
     @Temporal(TemporalType.DATE)
     @JsonProperty("Date")
     private Date date;
@@ -59,20 +59,20 @@ public class CommentDto implements Comparable<CommentDto>{
     @Override
     public String toString() {
         return "CommentDto{" +
-                "comment='" + comment + '\'' +
-                ", id=" + id +
+                "id=" + id +
+                ", comment='" + comment + '\'' +
                 ", date=" + date +
                 '}';
     }
+
     @Override
     public boolean equals(Object o) {
-        if (o == this) {return true;}
-        return o instanceof CommentDto && (((CommentDto) o).id) == this.id;
+
+        return (o == this) || o instanceof CommentDto && (((CommentDto) o).id) == id;
     }
+
     @Override
     public int compareTo(CommentDto o) {
-        if (this.getDate() == null || o.getDate() == null)
-            return 0;
-        return getDate().compareTo(o.getDate());
+        return (getDate() == null || o.getDate() == null) ? 0 : getDate().compareTo(o.getDate());
     }
 }

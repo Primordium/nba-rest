@@ -1,5 +1,7 @@
-package com.hro.exercise.nbachallenge.util;
+package com.hro.exercise.nbachallenge.config;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,6 +20,8 @@ public class DBConfiguration {
     private String url;
     private String username;
     private String password;
+    private static final Logger LOG = LoggerFactory.getLogger(DBConfiguration.class);
+
 
     public String getDriverClassName() {
         return driverClassName;
@@ -54,18 +58,22 @@ public class DBConfiguration {
     @Profile("dev")
     @Bean
     public String devDatabaseConnection() {
-        System.out.println("DB connection for DEV - H2");
-        System.out.println(driverClassName);
-        System.out.println(url);
+        LOG.info("LOADING DEVELOPMENT PROFILE");
+        LOG.info("DB connection for DEV - H2");
+        LOG.info(driverClassName);
+        LOG.info(url);
+
         return "DB connection for DEV - H2";
     }
 
     @Profile("prod")
     @Bean
     public String prodDatabaseConnection() {
-        System.out.println("DB Connection to RDS_PROD - High Performance Instance");
-        System.out.println(driverClassName);
-        System.out.println(url);
+        LOG.info("LOADING PRODUCTION PROFILE");
+        LOG.info("DB Connection to RDS_PROD - High Performance Instance");
+        LOG.info(driverClassName);
+        LOG.info(url);
+
         return "DB Connection to RDS_PROD - High Performance Instance";
     }
 }

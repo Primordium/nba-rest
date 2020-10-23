@@ -24,6 +24,7 @@ public abstract class AbstractConverter<S, T> implements Converter<S, T> {
         for(S toConvert : listToConvert) {
             conversions.add(convert(toConvert));
         }
+
         return conversions;
     }
 }

@@ -3,8 +3,10 @@ package com.hro.exercise.nbachallenge.controller.rest;
 import com.hro.exercise.nbachallenge.command.GameDto;
 import com.hro.exercise.nbachallenge.converters.GameDtoToGame;
 import com.hro.exercise.nbachallenge.converters.GameToGameDto;
+import com.hro.exercise.nbachallenge.exception.rest.ResourceNotFound;
 import com.hro.exercise.nbachallenge.persistence.dao.GameRepository;
 import com.hro.exercise.nbachallenge.persistence.model.Game;
+import com.hro.exercise.nbachallenge.util.AppConstants;
 import com.hro.exercise.nbachallenge.util.RapidApiConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.Errors;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,7 +32,7 @@ public class RestGameController {
     private GameToGameDto gameToGameDto;
     private RapidApiConnection rapidApiConnection = new RapidApiConnection();
     private GameDtoToGame gameDtoToGame;
-    private static final Logger log = LoggerFactory.getLogger(RestCommentController.class);
+    private static final Logger LOG = LoggerFactory.getLogger(RestGameController.class);
 
     /**
      * Sets the game to gameDto converter
@@ -81,7 +82,7 @@ public class RestGameController {
     @GetMapping(path = {"/", ""})
     public ResponseEntity<?> usageInstructions() {
         return new ResponseEntity<>("Usage: \n" +
-                "@pathparamenters should be /api/nbadb/ \n" +
+                "@pathparameters should be /api/nbadb/ \n" +
                 "GET date/{date} with yyyy-MM-dd format \n" +
                 "GET game/{gameId} where id is the game you searching for \n" +
                 "POST comments/{gameId} and in the body the text you want to post \n" +
@@ -95,7 +96,8 @@ public class RestGameController {
      */
     @GetMapping("/date")
     public ResponseEntity<?> getGamesByDate(
-            @RequestParam(value = "date", required = true) @DateTimeFormat(pattern = "yyyy-MM-dd") Date date) {
+            @RequestParam(value = "date", required = true)
+            @Validated @DateTimeFormat(pattern = AppConstants.DAY_TIME_FORMAT) Date date) throws ResourceNotFound {
         return getGamesByDateWithPath(date);
     }
 
@@ -103,8 +105,8 @@ public class RestGameController {
      * @see RestGameController#getGameByIdWithPath(Integer)
      */
     @GetMapping("game")
-    public ResponseEntity<?> getGameById(
-            @RequestParam(value = "gameid", required = true) Integer gameId) {
+    public ResponseEntity<?> getGameById(@RequestParam(value = "gameid", required = true)
+                                             @Validated Integer gameId) throws ResourceNotFound {
         return getGameByIdWithPath(gameId);
     }
 
@@ -116,26 +118,29 @@ public class RestGameController {
      * @return ResponseEntity<List < GameDto>>
      */
     @GetMapping("date/{date}")
-    public ResponseEntity<?> getGamesByDateWithPath(@PathVariable @Validated @DateTimeFormat(pattern = "yyyy-MM-dd") Date date) {
+    public ResponseEntity<?> getGamesByDateWithPath(@PathVariable @Validated @DateTimeFormat
+            (pattern = AppConstants.DAY_TIME_FORMAT) Date date) throws ResourceNotFound {
 
-        log.info("Game : Searching games with date " + date + " in Database");
-        List<Game> dbList = gameRepository.findByGameDate(date);
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        List<Game> dbList;
+        List<GameDto> apiList;
+        DateFormat dateFormat = new SimpleDateFormat(AppConstants.DAY_TIME_FORMAT);
 
-        log.info("Game : Searching games with date " + date + " in API");
-        List<GameDto> apiList = rapidApiConnection.getGamesByDate(dateFormat.format(date));
+        LOG.info("GAME : Searching Database games with date '" + date + "'");
+        dbList = gameRepository.findByGameDate(date);
+        apiList = rapidApiConnection.getGamesByDate(dateFormat.format(date));
 
         if (apiList.size() > dbList.size()) {
-            log.info("Game : Saving games. Api provided more games to the given date");
+            LOG.info("GAME : Merging, Rapid Api provided more games to the given date");
             gameRepository.saveAll(gameDtoToGame.convert(apiList));
             gameRepository.flush();
         }
 
         if (apiList.isEmpty() && dbList.isEmpty()) {
-            log.info("Game: There where no games to the given date: " + date);
-            return new ResponseEntity("There where no games for the give date",HttpStatus.NOT_FOUND);
+            LOG.info("GAME: There where no games to the given date: " + date);
+            throw new ResourceNotFound("There where no games for the give date");
         }
-        return new ResponseEntity(gameToGameDto.convert(gameRepository.findByGameDate(date)), HttpStatus.OK);
+
+        return ResponseEntity.ok(gameToGameDto.convert(gameRepository.findByGameDate(date)));
     }
 
     /**
@@ -145,23 +150,31 @@ public class RestGameController {
      * @return ResponseEntity<GameDto>
      */
     @GetMapping("/game/{gameId}")
-    public ResponseEntity<?> getGameByIdWithPath(@PathVariable Integer gameId) {
+    public ResponseEntity<?> getGameByIdWithPath(@PathVariable @Validated Integer gameId) throws ResourceNotFound {
+
+        GameDto gameDto;
 
         if (gameRepository.findByGameId(gameId) != null) {
-            log.info("GAME : The game with ID: " + gameId + " was found in Database");
-            GameDto gameDto = gameToGameDto.convert(gameRepository.findByGameId(gameId));
+            LOG.info("GAME : Found in DB the game with ID: '" + gameId + "'");
+            gameDto = gameToGameDto.convert(gameRepository.findByGameId(gameId));
             Collections.reverse(gameDto.getComments());
-            return new ResponseEntity<>(gameDto, HttpStatus.OK);
+
+            return ResponseEntity.ok(gameDto);
         }
 
-        log.info("GAME : Searching the game with ID: " + gameId + " in API");
-        GameDto gameDto = rapidApiConnection.getGameById(gameId);
+        LOG.info("GAME : Didn't find in DB game with ID : '" + gameId + "'");
+        gameDto = rapidApiConnection.getGameById(gameId);
+
         if (gameDto == null) {
-            return new ResponseEntity("Couldn't find any game with provided ID", HttpStatus.NOT_FOUND);
+            LOG.info("GAME : Couldn't find any game with provided ID : '" + gameId + "'");
+            throw new ResourceNotFound("Couldn't find any game with provided ID");
         }
+
         gameRepository.save(gameDtoToGame.convert(gameDto));
-        Collections.sort(gameDto.getComments(), Collections.reverseOrder());
-        return new ResponseEntity<>(gameDto, HttpStatus.OK);
+        gameDto.getComments().sort(Collections.reverseOrder());
+
+        return ResponseEntity.ok(gameDto);
     }
+
 }
 

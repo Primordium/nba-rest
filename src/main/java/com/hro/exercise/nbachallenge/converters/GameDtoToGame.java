@@ -35,7 +35,6 @@ public class GameDtoToGame extends AbstractConverter<GameDto, Game> {
         this.playerScoresDtoToPlayerScores = playerScoresDtoToPlayerScores;
     }
 
-
     @Override
     public Game convert(GameDto gameDto) {
         Game game = (gameDto.getId() != null ? gameRepository.getOne(gameDto.getId()) : new Game());
@@ -46,19 +45,15 @@ public class GameDtoToGame extends AbstractConverter<GameDto, Game> {
         game.setVisitorTeamScore(gameDto.getVisitorTeamScore());
         game.setGameDate(gameDto.getGameDate());
         game.setGameId(gameDto.getGameId());
-
-
         game.getPlayerScores().addAll(playerScoresDtoToPlayerScores.convert(gameDto.getPlayerScores()));
         game.getPlayerScores().forEach(e -> {e.setGame(game);});
-
-
-
 
         if (gameDto.getComments() != null) {
             game.setCommentList(commentDtoToComment.convert(gameDto.getComments()));
         } else {
             game.setCommentList(new ArrayList<Comment>());
         }
+
         return game;
     }
 }

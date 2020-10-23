@@ -1,13 +1,13 @@
 package com.hro.exercise.nbachallenge.persistence.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.hro.exercise.nbachallenge.command.CommentDto;
-import org.springframework.core.Ordered;
+import com.hro.exercise.nbachallenge.util.AppConstants;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.persistence.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 /**
  * The game model entity
  */
@@ -16,18 +16,23 @@ import java.util.*;
 public class Game extends AbstractModel {
 
     @JsonProperty
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @DateTimeFormat(pattern = AppConstants.DAY_TIME_FORMAT)
     @Temporal(TemporalType.DATE)
     private Date gameDate;
+
     @Column(name = "gameId", nullable = false)
     @JsonProperty
     private Integer gameId;
+
     @JsonProperty
     private String homeTeamName;
+
     @JsonProperty
     private String visitorTeamName;
+
     @JsonProperty
     private Integer homeTeamScore;
+
     @JsonProperty
     private Integer visitorTeamScore;
 
@@ -52,8 +57,8 @@ public class Game extends AbstractModel {
         return gameDate;
     }
 
-    public void setGameDate(Date date) {
-        this.gameDate = date;
+    public void setGameDate(Date gameDate) {
+        this.gameDate = gameDate;
     }
 
     public String getHomeTeamName() {
@@ -113,9 +118,9 @@ public class Game extends AbstractModel {
     }
 
     public void updateComment(Integer commentId, String commentNew) {
-        for (int i = 0; i < commentList.size(); i++) {
-            if(commentList.get(i).getId() == commentId) {
-                commentList.get(i).setComment(commentNew);
+        for (Comment c: commentList) {
+            if(c.getId() == commentId) {
+                c.setComment(commentNew);
                 break;
             }
         }
@@ -142,10 +147,6 @@ public class Game extends AbstractModel {
 
     @Override
     public boolean equals(Object o) {
-        if (o == this) {return true;}
-        if (o instanceof Game &&  (((Game) o).gameId) == this.gameId) {
-            return true;
-        }
-        return false;
+        return (o == this) || ((o instanceof Game) && ((((Game) o).gameId) == gameId));
     }
 }
