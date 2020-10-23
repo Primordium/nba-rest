@@ -3,8 +3,7 @@ package com.hro.exercise.nbachallenge.controller.rest;
 import com.hro.exercise.nbachallenge.command.GameDto;
 import com.hro.exercise.nbachallenge.converters.GameDtoToGame;
 import com.hro.exercise.nbachallenge.converters.GameToGameDto;
-import com.hro.exercise.nbachallenge.exception.ErrorMessage;
-import com.hro.exercise.nbachallenge.exception.rest.BadApiRequest;
+import com.hro.exercise.nbachallenge.util.Messages;
 import com.hro.exercise.nbachallenge.exception.rest.CustomException;
 import com.hro.exercise.nbachallenge.exception.rest.ResourceNotFound;
 import com.hro.exercise.nbachallenge.persistence.dao.GameRepository;
@@ -144,8 +143,8 @@ public class RestGameController {
         }
 
         if (apiList.isEmpty() && dbList.isEmpty()) {
-            LOG.info(ErrorMessage.GAME_NOT_FOUND_WITH_DATE + date);
-            throw new ResourceNotFound(ErrorMessage.GAME_NOT_FOUND_WITH_DATE);
+            LOG.info(Messages.GAME_NOT_FOUND_WITH_DATE + date);
+            throw new ResourceNotFound(Messages.GAME_NOT_FOUND_WITH_DATE);
         }
 
         return ResponseEntity.ok(gameToGameDto.convert(gameRepository.findByGameDate(date)));
@@ -170,15 +169,16 @@ public class RestGameController {
             return ResponseEntity.ok(gameDto);
         }
 
-        LOG.info(ErrorMessage.GAME_NOT_FOUND_WITH_ID + gameId);
+        LOG.info(Messages.GAME_NOT_FOUND_WITH_ID + gameId);
         gameDto = rapidApiConnection.getGameById(gameId);
 
         if (gameDto == null) {
-            LOG.info(ErrorMessage.GAME_NOT_FOUND_WITH_ID + gameId);
-            throw new ResourceNotFound(ErrorMessage.COMMENT_NOT_FOUND_WITH_ID + gameId);
+            LOG.info(Messages.GAME_NOT_FOUND_WITH_ID + gameId);
+            throw new ResourceNotFound(Messages.COMMENT_NOT_FOUND_WITH_ID + gameId);
         }
 
         gameRepository.save(gameDtoToGame.convert(gameDto));
+        LOG.info(Messages.GAME_SAVE + gameId);
         gameDto.getComments().sort(Collections.reverseOrder());
 
         return ResponseEntity.ok(gameDto);

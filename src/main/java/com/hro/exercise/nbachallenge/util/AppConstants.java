@@ -1,5 +1,8 @@
 package com.hro.exercise.nbachallenge.util;
 
+/**
+ * Values that are reused several times, as constant
+ */
 public abstract class AppConstants {
 
     public static final String DAY_TIME_FORMAT = "yyyy-MM-dd";

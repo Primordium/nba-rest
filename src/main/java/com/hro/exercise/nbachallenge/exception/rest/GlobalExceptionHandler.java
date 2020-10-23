@@ -8,6 +8,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.time.LocalDateTime;
 
+/**
+ * Exception Handler for Rest Related Exceptions
+ */
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
