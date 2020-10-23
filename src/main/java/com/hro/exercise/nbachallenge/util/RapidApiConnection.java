@@ -40,6 +40,7 @@ public class RapidApiConnection {
         NBA_API_PARSER = new NbaApiParser(OBJECT_MAPPER);
     }
 
+
     /**
      * Opens a connection and retrieves the body of the request done to RapidApi
      *
