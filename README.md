@@ -11,6 +11,7 @@ Exposes a rest endpoints for queries in https://rapidapi.com/theapiguy/api/free-
    - POST "comments/{gameId}" Creates a new comment for the game with the id provided;
    - PUT  "comments/{commentId}" Edits the comment with the provided comment id;
    - DELETE "comments/{commentId}" Deletes a comment with the provided comment id;
+   - GET "/actuator" for monitoring endpoints
 
 ## How to install
 
