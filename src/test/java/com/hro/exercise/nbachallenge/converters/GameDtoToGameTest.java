@@ -1,22 +1,22 @@
 package com.hro.exercise.nbachallenge.converters;
 
-import static org.mockito.Mockito.*;
-import static org.junit.jupiter.api.Assertions.*;
-
+import com.hro.exercise.nbachallenge.command.CommentDto;
 import com.hro.exercise.nbachallenge.command.GameDto;
 import com.hro.exercise.nbachallenge.command.PlayerScoresDto;
 import com.hro.exercise.nbachallenge.persistence.dao.GameRepository;
+import com.hro.exercise.nbachallenge.persistence.model.Comment;
 import com.hro.exercise.nbachallenge.persistence.model.Game;
 import com.hro.exercise.nbachallenge.persistence.model.PlayerScores;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import com.hro.exercise.nbachallenge.command.CommentDto;
-import com.hro.exercise.nbachallenge.persistence.model.Comment;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.*;
 
 class GameDtoToGameTest {
 
@@ -66,14 +66,14 @@ class GameDtoToGameTest {
 
         Game game = gameDtoToGame.convert(gameDto);
 
-        assertTrue(game.getGameDate().equals(gameDto.getGameDate()));
-        assertTrue(game.getCommentList().equals(comments));
-        assertTrue(game.getPlayerScores().equals(playerScores));
-        assertTrue(game.getGameId().equals(gameId));
-        assertTrue(game.getHomeTeamName().equals(homeTeamName));
-        assertTrue(game.getVisitorTeamName().equals(visitorTeamName));
-        assertTrue(game.getHomeTeamScore().equals(score));
-        assertTrue(game.getVisitorTeamScore().equals(score));
+        assertEquals(game.getGameDate(), gameDto.getGameDate());
+        assertEquals(game.getCommentList(), comments);
+        assertEquals(game.getPlayerScores(), playerScores);
+        assertEquals(game.getGameId(), gameId);
+        assertEquals(game.getHomeTeamName(), homeTeamName);
+        assertEquals(game.getVisitorTeamName(), visitorTeamName);
+        assertEquals(game.getHomeTeamScore(), score);
+        assertEquals(game.getVisitorTeamScore(), score);
 
         verify(playerScoresDtoToPlayerScores, times(1)).convert(playerScoresDtoList);
     }

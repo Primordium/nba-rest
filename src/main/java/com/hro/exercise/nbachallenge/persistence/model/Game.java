@@ -1,14 +1,13 @@
 package com.hro.exercise.nbachallenge.persistence.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.hro.exercise.nbachallenge.command.CommentDto;
 import com.hro.exercise.nbachallenge.util.AppConstants;
-import org.springframework.core.Ordered;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.persistence.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 /**
  * The game model entity
  */

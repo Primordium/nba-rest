@@ -3,8 +3,10 @@ package com.hro.exercise.nbachallenge.util;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hro.exercise.nbachallenge.command.GameDto;
-import com.hro.exercise.nbachallenge.controller.rest.RestCommentController;
-import com.hro.exercise.nbachallenge.exception.*;
+import com.hro.exercise.nbachallenge.exception.ApiConnectionFail;
+import com.hro.exercise.nbachallenge.exception.BadApiRequest;
+import com.hro.exercise.nbachallenge.exception.ErrorMessage;
+import com.hro.exercise.nbachallenge.exception.JsonProcessingFailure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -16,32 +18,31 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 @Component
 public class RapidApiConnection {
 
-    private ObjectMapper objectMapper;
-    private NbaApiParser nbaApiParser;
+    private final ObjectMapper OBJECT_MAPPER;
+    private final NbaApiParser NBA_API_PARSER;
     private static final Logger LOG = LoggerFactory.getLogger(RapidApiConnection.class);
 
     // Was in use, before docker, will try to implement again.
     private File configFile;
 
     public RapidApiConnection() {
-        LOG.info("Opening api config file");
+        //LOG.info("Opening api config file");
         // replace file with key for hardcoded key because docker
         //configFile = Paths.get("src\\main\\resources\\conf\\apiconf.json").toFile();
-        objectMapper = new ObjectMapper();
-        nbaApiParser = new NbaApiParser(objectMapper);
+        OBJECT_MAPPER = new ObjectMapper();
+        NBA_API_PARSER = new NbaApiParser(OBJECT_MAPPER);
     }
 
     /**
      * Opens a connection and retrieves the body of the request done to RapidApi
+     *
      * @param urlSuffix used by other methods to search Api for specific data
      * @return HttpResponse with contents of the request
      */
@@ -56,12 +57,17 @@ public class RapidApiConnection {
                     .method("GET", HttpRequest.BodyPublishers.noBody())
                     .build();
 
+
             response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+
+            if (HttpStatus.valueOf(response.statusCode()) == HttpStatus.INTERNAL_SERVER_ERROR) {
+                throw new ApiConnectionFail();
+            }
+
         } catch (IOException e) {
             LOG.error("RAPID API : Config file not found");
-        } catch (InterruptedException e) {
-            System.out.println(new ApiConnectionFail().getMessage());
-            LOG.error("RAPID API : Connection to Api has failed");
+        } catch (ApiConnectionFail | InterruptedException apiConnectionFail) {
+            LOG.error(apiConnectionFail.getMessage());
         }
 
         return response;
@@ -70,9 +76,10 @@ public class RapidApiConnection {
     /**
      * Searches Rapid Api for a specific date, after getting all gameIds
      * invokes getGameById to retrieve the gameDtos
-     * @see RapidApiConnection#getGameById(Integer);
+     *
      * @param date to search for
      * @return List GameDtos
+     * @see RapidApiConnection#getGameById(Integer);
      */
     public List<GameDto> getGamesByDate(String date) {
         LOG.info("RAPID API : Searching game with date : '" + date + "'");
@@ -85,23 +92,26 @@ public class RapidApiConnection {
         try {
             if ((HttpStatus.valueOf(response.statusCode()) == HttpStatus.INTERNAL_SERVER_ERROR) ||
                     (HttpStatus.valueOf(response.statusCode()) == HttpStatus.NOT_FOUND) ||
-                    objectMapper.readTree(response.body()).path("data").isEmpty()) {
+                    OBJECT_MAPPER.readTree(response.body()).path("data").isEmpty()) {
 
                 LOG.warn("RAPID API: Did NOT provide games with date '" + date + "'");
-                System.out.println(new BadApiRequest().getMessage());
+                throw new BadApiRequest();
             }
 
-            int total_pages = objectMapper.readTree(response.body()).findPath("meta").findPath("total_pages").asInt();
-            int currentPage = objectMapper.readTree(response.body()).findPath("meta").findPath("current_page").asInt();
+            int total_pages = OBJECT_MAPPER.readTree(response.body()).findPath("meta").findPath("total_pages").asInt();
+            int currentPage = OBJECT_MAPPER.readTree(response.body()).findPath("meta").findPath("current_page").asInt();
 
             while (currentPage++ <= total_pages) {
-                gameDtoList.addAll(nbaApiParser.getAllStatsByDate(response));
+                gameDtoList.addAll(NBA_API_PARSER.getAllStatsByDate(response));
                 currentUrl = url.replace("%(pageNumber)", Integer.toString(currentPage));
                 response = openNbaApiConnection(currentUrl);
             }
+
         } catch (JsonProcessingException e) {
             LOG.error("RAPID API : Provided bad Json object, could not parse");
             LOG.error(new JsonProcessingFailure().getMessage());
+        } catch (BadApiRequest badApiRequest) {
+            badApiRequest.getMessage();
         }
 
         List<GameDto> fullStatsList = new ArrayList<>();
@@ -120,9 +130,10 @@ public class RapidApiConnection {
 
     /**
      * Method to search Rapid Api for a gameId return a gameDto
-     * @see NbaApiParser
+     *
      * @param gameId the id to search for
      * @return gameDto if present null if not
+     * @see NbaApiParser
      */
     public GameDto getGameById(Integer gameId) {
 
@@ -132,31 +143,30 @@ public class RapidApiConnection {
         try {
             if ((HttpStatus.valueOf(response.statusCode()) == HttpStatus.INTERNAL_SERVER_ERROR) ||
                     (HttpStatus.valueOf(response.statusCode()) == HttpStatus.NOT_FOUND) ||
-                    objectMapper.readTree(response.body()).path("data").isEmpty()) {
+                    OBJECT_MAPPER.readTree(response.body()).path("data").isEmpty()) {
 
                 LOG.warn("RAPID API: Game not found with game id: '" + gameId + "'");
 
                 gameDto = null;
             }
         } catch (JsonProcessingException e) {
-            LOG.error("RAPID API : Provided bad Json object, could not parse");
-            LOG.error(new JsonProcessingFailure().getMessage());
+            LOG.error(ErrorMessage.JSON_PARSE_PROBLEM);
         }
 
-        if(gameDto != null) {
+        if (gameDto != null) {
             try {
-                gameDto.setPlayerScores(nbaApiParser.getPlayerScores(response));
+                gameDto.setPlayerScores(NBA_API_PARSER.getPlayerScores(response));
                 response = openNbaApiConnection("games/" + gameId);
-                gameDto.setGameId(nbaApiParser.getGameId(response));
-                gameDto.setHomeTeamName(nbaApiParser.getHomeTeamName(response));
-                gameDto.setVisitorTeamName(nbaApiParser.getVisitorTeamName(response));
-                gameDto.setHomeTeamScore(nbaApiParser.getHomeTeamScore(response));
-                gameDto.setVisitorTeamScore(nbaApiParser.getVisitorTeamScore(response));
-                gameDto.setGameDate(nbaApiParser.getGameDate(response));
+                gameDto.setGameId(NBA_API_PARSER.getGameId(response));
+                gameDto.setHomeTeamName(NBA_API_PARSER.getHomeTeamName(response));
+                gameDto.setVisitorTeamName(NBA_API_PARSER.getVisitorTeamName(response));
+                gameDto.setHomeTeamScore(NBA_API_PARSER.getHomeTeamScore(response));
+                gameDto.setVisitorTeamScore(NBA_API_PARSER.getVisitorTeamScore(response));
+                gameDto.setGameDate(NBA_API_PARSER.getGameDate(response));
                 LOG.info("RAPID API : Found game with game id : '" + gameId + "'");
 
             } catch (Exception e) {
-                LOG.error(new JsonProcessingFailure().getMessage());
+                LOG.error(ErrorMessage.JSON_PARSE_PROBLEM);
             }
         }
         return gameDto;

@@ -5,9 +5,11 @@ import com.hro.exercise.nbachallenge.persistence.dao.CommentRepository;
 import com.hro.exercise.nbachallenge.persistence.model.Comment;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import static org.mockito.Mockito.*;
-import static org.junit.jupiter.api.Assertions.*;
+
 import java.util.Date;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.*;
 
 class CommentDtoToCommentTest {
 
@@ -42,8 +44,8 @@ class CommentDtoToCommentTest {
 
         verify(commentRepository, times(1)).getOne(anyInt());
 
-        assertTrue(comment.getDate().equals(fakeComment.getDate()));
-        assertTrue(comment.getComment().equals(fakeComment.getComment()));
+        assertEquals(comment.getDate(), fakeComment.getDate());
+        assertEquals(comment.getComment(), fakeComment.getComment());
 
 
     }

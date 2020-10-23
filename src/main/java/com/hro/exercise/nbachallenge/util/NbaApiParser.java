@@ -12,7 +12,9 @@ import java.io.IOException;
 import java.net.http.HttpResponse;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.TimeZone;
 import java.util.stream.Collectors;
 
 /**
@@ -69,7 +71,6 @@ public class NbaApiParser {
         JsonNode jsonNode = OBJECT_MAPPER.readTree(response.body()).findPath("data");
         List<GameDto> gameStatsList = OBJECT_MAPPER.readValue(jsonNode.toString(), new TypeReference<>() {
         });
-
         return gameStatsList.isEmpty() ? null : gameStatsList;
     }
 

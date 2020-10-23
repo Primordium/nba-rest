@@ -3,6 +3,7 @@ package com.hro.exercise.nbachallenge.controller.rest;
 import com.hro.exercise.nbachallenge.command.GameDto;
 import com.hro.exercise.nbachallenge.converters.GameDtoToGame;
 import com.hro.exercise.nbachallenge.converters.GameToGameDto;
+import com.hro.exercise.nbachallenge.exception.rest.ResourceNotFound;
 import com.hro.exercise.nbachallenge.persistence.dao.GameRepository;
 import com.hro.exercise.nbachallenge.persistence.model.Game;
 import com.hro.exercise.nbachallenge.util.AppConstants;
@@ -81,7 +82,7 @@ public class RestGameController {
     @GetMapping(path = {"/", ""})
     public ResponseEntity<?> usageInstructions() {
         return new ResponseEntity<>("Usage: \n" +
-                "@pathparamenters should be /api/nbadb/ \n" +
+                "@pathparameters should be /api/nbadb/ \n" +
                 "GET date/{date} with yyyy-MM-dd format \n" +
                 "GET game/{gameId} where id is the game you searching for \n" +
                 "POST comments/{gameId} and in the body the text you want to post \n" +
@@ -96,7 +97,7 @@ public class RestGameController {
     @GetMapping("/date")
     public ResponseEntity<?> getGamesByDate(
             @RequestParam(value = "date", required = true)
-            @Validated @DateTimeFormat(pattern = AppConstants.DAY_TIME_FORMAT) Date date) {
+            @Validated @DateTimeFormat(pattern = AppConstants.DAY_TIME_FORMAT) Date date) throws ResourceNotFound {
         return getGamesByDateWithPath(date);
     }
 
@@ -104,7 +105,8 @@ public class RestGameController {
      * @see RestGameController#getGameByIdWithPath(Integer)
      */
     @GetMapping("game")
-    public ResponseEntity<?> getGameById(@RequestParam(value = "gameid", required = true) @Validated Integer gameId) {
+    public ResponseEntity<?> getGameById(@RequestParam(value = "gameid", required = true)
+                                             @Validated Integer gameId) throws ResourceNotFound {
         return getGameByIdWithPath(gameId);
     }
 
@@ -116,13 +118,12 @@ public class RestGameController {
      * @return ResponseEntity<List < GameDto>>
      */
     @GetMapping("date/{date}")
-    public ResponseEntity<?> getGamesByDateWithPath(
-            @PathVariable @Validated @DateTimeFormat(pattern = AppConstants.DAY_TIME_FORMAT) Date date) {
+    public ResponseEntity<?> getGamesByDateWithPath(@PathVariable @Validated @DateTimeFormat
+            (pattern = AppConstants.DAY_TIME_FORMAT) Date date) throws ResourceNotFound {
 
         List<Game> dbList;
         List<GameDto> apiList;
         DateFormat dateFormat = new SimpleDateFormat(AppConstants.DAY_TIME_FORMAT);
-        ResponseEntity<?> responseEntity = null;
 
         LOG.info("GAME : Searching Database games with date '" + date + "'");
         dbList = gameRepository.findByGameDate(date);
@@ -136,16 +137,10 @@ public class RestGameController {
 
         if (apiList.isEmpty() && dbList.isEmpty()) {
             LOG.info("GAME: There where no games to the given date: " + date);
-            responseEntity = new ResponseEntity("There where no games for the give date",
-                    HttpStatus.NOT_FOUND);
+            throw new ResourceNotFound("There where no games for the give date");
         }
 
-        if(responseEntity == null) {
-            responseEntity = new ResponseEntity(gameToGameDto.convert(gameRepository.findByGameDate(date)),
-                    HttpStatus.OK);
-        }
-
-        return  responseEntity;
+        return ResponseEntity.ok(gameToGameDto.convert(gameRepository.findByGameDate(date)));
     }
 
     /**
@@ -155,31 +150,31 @@ public class RestGameController {
      * @return ResponseEntity<GameDto>
      */
     @GetMapping("/game/{gameId}")
-    public ResponseEntity<?> getGameByIdWithPath(@PathVariable @Validated Integer gameId) {
+    public ResponseEntity<?> getGameByIdWithPath(@PathVariable @Validated Integer gameId) throws ResourceNotFound {
 
-        ResponseEntity<?> responseEntity = null;
         GameDto gameDto;
 
         if (gameRepository.findByGameId(gameId) != null) {
             LOG.info("GAME : Found in DB the game with ID: '" + gameId + "'");
             gameDto = gameToGameDto.convert(gameRepository.findByGameId(gameId));
             Collections.reverse(gameDto.getComments());
-            responseEntity = new ResponseEntity<>(gameDto, HttpStatus.OK);
+
+            return ResponseEntity.ok(gameDto);
         }
 
         LOG.info("GAME : Didn't find in DB game with ID : '" + gameId + "'");
         gameDto = rapidApiConnection.getGameById(gameId);
 
-        if (gameDto == null && responseEntity == null) {
-            responseEntity = new ResponseEntity("Couldn't find any game with provided ID", HttpStatus.NOT_FOUND);
+        if (gameDto == null) {
+            LOG.info("GAME : Couldn't find any game with provided ID : '" + gameId + "'");
+            throw new ResourceNotFound("Couldn't find any game with provided ID");
         }
 
-        if(responseEntity == null) {
-            gameRepository.save(gameDtoToGame.convert(gameDto));
-            Collections.sort(gameDto.getComments(), Collections.reverseOrder());
-            responseEntity = new ResponseEntity<>(gameDto, HttpStatus.OK);
-        }
-        return responseEntity;
+        gameRepository.save(gameDtoToGame.convert(gameDto));
+        gameDto.getComments().sort(Collections.reverseOrder());
+
+        return ResponseEntity.ok(gameDto);
     }
+
 }
 

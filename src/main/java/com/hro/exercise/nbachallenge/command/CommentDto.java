@@ -3,7 +3,6 @@ package com.hro.exercise.nbachallenge.command;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.hro.exercise.nbachallenge.persistence.model.Comment;
 import com.hro.exercise.nbachallenge.util.AppConstants;
 import com.sun.istack.NotNull;
 import org.springframework.format.annotation.DateTimeFormat;

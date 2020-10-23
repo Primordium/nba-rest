@@ -1,14 +1,16 @@
 package com.hro.exercise.nbachallenge.converters;
 
-import com.hro.exercise.nbachallenge.persistence.model.Game;
-import org.junit.jupiter.api.Test;
 import com.hro.exercise.nbachallenge.command.CommentDto;
 import com.hro.exercise.nbachallenge.persistence.dao.CommentRepository;
 import com.hro.exercise.nbachallenge.persistence.model.Comment;
+import com.hro.exercise.nbachallenge.persistence.model.Game;
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import static org.mockito.Mockito.*;
-import static org.junit.jupiter.api.Assertions.*;
+
 import java.util.Date;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
 
 class CommentToCommentDtoTest {
 

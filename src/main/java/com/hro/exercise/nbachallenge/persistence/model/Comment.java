@@ -32,7 +32,7 @@ public class Comment extends AbstractModel implements Comparable<Comment> {
     }
 
     /**
-     * Method used to change comment and reflect in commentList of game aswell
+     * Method used to change comment and reflect in commentList of game as well
      * @param comment
      */
     public void editComment(String comment) {
@@ -62,7 +62,7 @@ public class Comment extends AbstractModel implements Comparable<Comment> {
     }
 
     /**
-     * Sets game wich comments is associated to
+     * Sets game which comments is associated to
      * @param game
      */
     public void setGame(Game game) {

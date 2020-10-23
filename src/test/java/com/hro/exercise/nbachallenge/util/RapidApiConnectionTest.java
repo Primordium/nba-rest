@@ -1,12 +1,8 @@
 package com.hro.exercise.nbachallenge.util;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hro.exercise.nbachallenge.command.GameDto;
 import com.hro.exercise.nbachallenge.command.PlayerScoresDto;
-import com.hro.exercise.nbachallenge.persistence.model.PlayerScores;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -21,9 +17,11 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.nio.file.Path;
 import java.text.ParseException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -75,14 +73,14 @@ class RapidApiConnectionTest {
 
         GameDto gameDto = rapidApiConnection.getGameById(1);
 
-        // TODO: 10/22/2020 assert.equals
-        assertTrue(gameDto.getGameId().equals(gameId));
-        assertTrue(gameDto.getGameDate().equals(date));
-        assertTrue(gameDto.getHomeTeamName().equals(homeTeamName));
-        assertTrue(gameDto.getVisitorTeamName().equals(visitorTeamName));
-        assertTrue(gameDto.getHomeTeamScore().equals(homeTeamScore));
-        assertTrue(gameDto.getVisitorTeamScore().equals(visitorTeamScore));
-        assertTrue(gameDto.getPlayerScores().equals(playerScores));
+
+        assertEquals(gameDto.getGameId(), gameId);
+        assertEquals(gameDto.getGameDate(), date);
+        assertEquals(gameDto.getHomeTeamName(), homeTeamName);
+        assertEquals(gameDto.getVisitorTeamName(), visitorTeamName);
+        assertEquals(gameDto.getHomeTeamScore(), homeTeamScore);
+        assertEquals(gameDto.getVisitorTeamScore(), visitorTeamScore);
+        assertEquals(gameDto.getPlayerScores(), playerScores);
 
     }
 }
