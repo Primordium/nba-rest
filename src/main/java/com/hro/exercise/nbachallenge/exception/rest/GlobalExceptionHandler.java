@@ -10,8 +10,8 @@ import java.time.LocalDateTime;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(BadRequest.class)
-    public ResponseEntity<ExceptionResponse> customException(BadRequest ex) {
+    @ExceptionHandler(BadApiRequest.class)
+    public ResponseEntity<ExceptionResponse> customException(BadApiRequest ex) {
         ExceptionResponse response=new ExceptionResponse();
         response.setErrorCode("BAD_REQUEST");
         response.setErrorMessage(ex.getMessage());

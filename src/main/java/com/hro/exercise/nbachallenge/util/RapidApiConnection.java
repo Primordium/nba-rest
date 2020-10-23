@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hro.exercise.nbachallenge.command.GameDto;
 import com.hro.exercise.nbachallenge.exception.ApiConnectionFail;
-import com.hro.exercise.nbachallenge.exception.BadApiRequest;
+import com.hro.exercise.nbachallenge.exception.BadRapidApiRequest;
 import com.hro.exercise.nbachallenge.exception.ErrorMessage;
 import com.hro.exercise.nbachallenge.exception.JsonProcessingFailure;
 import org.slf4j.Logger;
@@ -95,7 +95,7 @@ public class RapidApiConnection {
                     OBJECT_MAPPER.readTree(response.body()).path("data").isEmpty()) {
 
                 LOG.warn("RAPID API: Did NOT provide games with date '" + date + "'");
-                throw new BadApiRequest();
+                throw new BadRapidApiRequest();
             }
 
             int total_pages = OBJECT_MAPPER.readTree(response.body()).findPath("meta").findPath("total_pages").asInt();
@@ -110,8 +110,8 @@ public class RapidApiConnection {
         } catch (JsonProcessingException e) {
             LOG.error("RAPID API : Provided bad Json object, could not parse");
             LOG.error(new JsonProcessingFailure().getMessage());
-        } catch (BadApiRequest badApiRequest) {
-            badApiRequest.getMessage();
+        } catch (BadRapidApiRequest badRapidApiRequest) {
+            badRapidApiRequest.getMessage();
         }
 
         List<GameDto> fullStatsList = new ArrayList<>();
