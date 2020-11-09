@@ -50,7 +50,7 @@ class RapidApiConnectionTest {
         objectMapper = new ObjectMapper();
     }
     @Test
-    void getGameById() throws IOException, ParseException {
+    void getGameByIdValidId() throws IOException, ParseException {
 
         List<PlayerScoresDto> playerScores = new ArrayList<>();
         Date date = new Date();
@@ -60,13 +60,19 @@ class RapidApiConnectionTest {
         Integer homeTeamScore = 100;
         Integer visitorTeamScore = 200;
 
-        when(nbaApiParser.getGameId(any())).thenReturn(1);
+        GameDto gameP = new GameDto();
+        gameP.setGameId(gameId);
+        gameP.setGameDate(date);
+        gameP.setVisitorTeamScore(visitorTeamScore);
+        gameP.setHomeTeamScore(homeTeamScore);
+        gameP.setHomeTeamName(homeTeamName);
+        gameP.setVisitorTeamName(visitorTeamName);
+        gameP.setPlayerScores(playerScores);
+
         when(nbaApiParser.getGameDate(any())).thenReturn(date);
-        when(nbaApiParser.getHomeTeamName(any())).thenReturn(homeTeamName);
-        when(nbaApiParser.getVisitorTeamName(any())).thenReturn(visitorTeamName);
-        when(nbaApiParser.getHomeTeamScore(any())).thenReturn(homeTeamScore);
-        when(nbaApiParser.getVisitorTeamScore(any())).thenReturn(visitorTeamScore);
         when(nbaApiParser.getPlayerScores(any())).thenReturn(playerScores);
+        when(nbaApiParser.getAllGameProperties(any(), any())).thenReturn(gameP);
+
 
         GameDto gameDto = rapidApiConnection.getGameById(1);
 

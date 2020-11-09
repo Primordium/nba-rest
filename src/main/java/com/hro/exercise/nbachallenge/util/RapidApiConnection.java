@@ -163,12 +163,8 @@ public class RapidApiConnection {
             try {
                 gameDto.setPlayerScores(nbaApiParser.getPlayerScores(response));
                 response = openNbaApiConnection("games/" + gameId);
-                gameDto.setGameId(nbaApiParser.getGameId(response));
-                gameDto.setHomeTeamName(nbaApiParser.getHomeTeamName(response));
-                gameDto.setVisitorTeamName(nbaApiParser.getVisitorTeamName(response));
-                gameDto.setHomeTeamScore(nbaApiParser.getHomeTeamScore(response));
-                gameDto.setVisitorTeamScore(nbaApiParser.getVisitorTeamScore(response));
-                gameDto.setGameDate(nbaApiParser.getGameDate(response));
+                gameDto = nbaApiParser.getAllGameProperties(response, gameDto);
+                System.out.println(gameDto);
                 LOG.info("RAPID API : Found game with game id : '" + gameId + "'");
 
             } catch (Exception e) {
@@ -177,4 +173,5 @@ public class RapidApiConnection {
         }
         return gameDto;
     }
+
 }

@@ -127,12 +127,12 @@ public class GameDto {
     }
 
     @JsonProperty("home_team")
-    public void setHomeName(Map<String, String> homeTeam) {
+    public void setJsonHomeName(Map<String, String> homeTeam) {
         setHomeTeamName(homeTeam.get("full_name"));
     }
 
     @JsonProperty("visitor_team")
-    public void setVisName(Map<String, String> visitorTeam) {
+    public void setJsonVisName(Map<String, String> visitorTeam) {
         setVisitorTeamName(visitorTeam.get("full_name"));
     }
 

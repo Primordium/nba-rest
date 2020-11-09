@@ -11,6 +11,8 @@ import com.hro.exercise.nbachallenge.persistence.model.Game;
 import com.hro.exercise.nbachallenge.util.AppConstants;
 import com.hro.exercise.nbachallenge.util.RapidApiConnection;
 import com.sun.istack.NotNull;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Hidden;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,7 +85,7 @@ public class RestGameController {
      *
      * @return
      */
-    @GetMapping(path = {"/", ""})
+    @GetMapping(path = {"/"})
     public ResponseEntity<?> usageInstructions() {
         return new ResponseEntity<>("Usage: \n" +
                 "@pathparameters should be /api/nbadb/ \n" +
@@ -98,6 +100,7 @@ public class RestGameController {
     /**
      * @see RestGameController#getGameByIdWithPath(Integer)
      */
+    @ApiOperation(value = "", hidden = true)
     @GetMapping("/date")
     public ResponseEntity<?> getGamesByDate(
             @RequestParam(value = "date", required = true)
@@ -108,6 +111,7 @@ public class RestGameController {
     /**
      * @see RestGameController#getGameByIdWithPath(Integer)
      */
+    @ApiOperation(value = "", hidden = true)
     @GetMapping("game")
     public ResponseEntity<?> getGameById(@RequestParam(value = "gameid", required = true)
                                              @Validated Integer gameId) throws ResourceNotFound {

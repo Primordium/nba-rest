@@ -95,4 +95,18 @@ public class NbaApiParser {
                         .filter(e -> e.getScore() > 0)
                         .collect(Collectors.toList());
     }
+
+    public GameDto getAllGameProperties(HttpResponse response, GameDto gameDto) throws JsonProcessingException, ParseException {
+        System.out.println(gameDto);
+
+            gameDto.setGameId(getGameId(response));
+            gameDto.setHomeTeamName(getHomeTeamName(response));
+            gameDto.setVisitorTeamName(getVisitorTeamName(response));
+            gameDto.setHomeTeamScore(getHomeTeamScore(response));
+            gameDto.setVisitorTeamScore(getVisitorTeamScore(response));
+            gameDto.setGameDate(getGameDate(response));
+
+
+        return gameDto;
+    }
 }
